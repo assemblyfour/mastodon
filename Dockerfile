@@ -81,7 +81,7 @@ RUN bundle config build.nokogiri --with-iconv-lib=/usr/local/lib --with-iconv-in
 
 COPY . /mastodon
 
-RUN bundle exec rails assets:precompile RAILS_ENV=production
+RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake
 
 USER mastodon
 
