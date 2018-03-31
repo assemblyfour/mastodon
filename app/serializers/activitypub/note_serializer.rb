@@ -18,6 +18,10 @@ class ActivityPub::NoteSerializer < ActiveModel::Serializer
     'Note'
   end
 
+  def sensitive
+    true
+  end
+
   def summary
     object.spoiler_text.presence
   end
