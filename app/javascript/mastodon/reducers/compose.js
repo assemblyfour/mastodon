@@ -262,6 +262,12 @@ export default function compose(state = initialState, action) {
       .update('text', text => `${text}@${action.account.get('acct')} `)
       .set('focusDate', new Date())
       .set('idempotencyKey', uuid());
+  case COMPOSE_DIRECT:
+    return state
+      .update('text', text => `@${action.account.get('acct')} `)
+      .set('privacy', 'direct')
+      .set('focusDate', new Date())
+      .set('idempotencyKey', uuid());
   case COMPOSE_SUGGESTIONS_CLEAR:
     return state.update('suggestions', ImmutableList(), list => list.clear()).set('suggestion_token', null);
   case COMPOSE_SUGGESTIONS_READY:
