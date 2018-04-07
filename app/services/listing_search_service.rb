@@ -35,6 +35,7 @@ class ListingSearchService < BaseService
   def perform_listing_search!
      ListingsIndex.query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed location location.stemmed) })
                             .limit(100)
+                            .order(created_at: {order: :desc})
                             .objects
                             .compact
   end
