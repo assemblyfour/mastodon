@@ -12,6 +12,7 @@ class ListingSearchService < BaseService
                        .excluding_silenced_accounts
                        .where('statuses.created_at > ?', 7.days.ago)
                        .where('LOWER(statuses.text) LIKE ?', '%location:%')
+                       .order('statuses.created_at DESC')
   end
 
   def call(query)
