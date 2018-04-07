@@ -1,11 +1,6 @@
 .compact-header
   %h1 Switter Listings
 
-.flash-message
-  %p To have your toot appear here, it must include the "#swlisting" hashtag, "Location: [your location]" on its own line.
-  %p Listings last for 7 days.
-  %p Listings are a work in progress. Don't abuse this feature (post too often) otherwise you will be barred from this feature.
-
 = form_tag '/', method: 'GET', class: 'simple_form' do
   .fields-group
     .input.string.required
@@ -13,6 +8,12 @@
 
     .actions
       %button Search
+      = link_to 'Post a listing', 'https://switter.at/share?text=I%27m%20available%20for%0A%0ALocation:%20%0aContact:%20%0a%0a%23swlisting', class: 'button'
+
+    .flash-message
+      %p Listings last for 7 days.
+      %p Listings are a work in progress. Don't abuse this feature (post too often) otherwise you will be barred from this feature.
+
 
 - @results[:listings].each do |listing|
   - stream_entry = listing.stream_entry
