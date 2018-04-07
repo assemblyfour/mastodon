@@ -1,14 +1,15 @@
 .compact-header
   %h1 Switter Listings
 
+%p
+  Search #{ListingSearchService.listings.count} Switter listings.
 = form_tag '/', method: 'GET', class: 'simple_form' do
   .fields-group
     .input.string.required
-      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Search terms. i.e. Melbourne'
+      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms. For example: Melbourne'
 
     .actions
       %button Search
-
       = link_to 'Post a listing', %Q|https://switter.at/share?text=#{URI.encode(@placeholder)}|, class: 'button'
 
     .flash-message
