@@ -316,6 +316,10 @@ Rails.application.routes.draw do
   get '/about/more', to: 'about#more'
   get '/terms',      to: 'about#terms'
 
+  constraints subdomain: 'listings' do
+    get '/', to: 'listings#index'
+  end
+
   root 'home#index'
 
   match '*unmatched_route',

@@ -1,0 +1,21 @@
+.compact-header
+  %h1 Switter Listings
+
+= form_tag '/', method: 'GET', class: 'simple_form' do
+  .fields-group
+    .input.string.required
+      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Search terms. i.e. Melbourne'
+
+    .actions
+      %button Search
+
+- @results[:listings].each do |listing|
+  - stream_entry = listing.stream_entry
+  - type         = stream_entry.activity_type.downcase
+  .activity-stream.activity-stream-headless.h-entry
+    = render partial: "stream_entries/#{type}", locals: { type.to_sym => stream_entry.activity, include_threads: false }
+  %br
+
+- if @results[:listings].empty?
+  .flash-message= "Sorry, your search for '#{params[:query]}' has no results. Try a different search term."
+

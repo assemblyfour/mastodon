@@ -32,6 +32,7 @@ class Status < ApplicationRecord
   include StatusThreadingConcern
 
   update_index('statuses#status', :proper) if Chewy.enabled?
+  update_index('listings') { self } if Chewy.enabled?
 
   enum visibility: [:public, :unlisted, :private, :direct], _suffix: :visibility
 
