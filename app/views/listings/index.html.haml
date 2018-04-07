@@ -8,7 +8,8 @@
 
     .actions
       %button Search
-      = link_to 'Post a listing', 'https://switter.at/share?text=I%27m%20available%20for%0A%0ALocation:%20%0aContact:%20%0a%0a%23swlisting', class: 'button'
+
+      = link_to 'Post a listing', %Q|https://switter.at/share?text=#{URI.encode(@placeholder)}|, class: 'button'
 
     .flash-message
       %p Listings last for 7 days.
