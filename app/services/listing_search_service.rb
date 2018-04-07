@@ -3,6 +3,7 @@
 class ListingSearchService < BaseService
   attr_accessor :query
 
+  RESULTS = 50
   def self.listings
     ::Status.tagged_with(Tag.find_by(name: 'swlisting'))
                        .local
@@ -30,12 +31,12 @@ class ListingSearchService < BaseService
   private
 
   def all_listings
-    self.class.listings.limit(50)
+    self.class.listings.limit(RESULTS)
   end
 
   def perform_listing_search!
      ListingsIndex.query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed location location.stemmed) })
-                            .limit(50)
+                            .limit(RESULTS)
                             .order(created_at: {order: :desc})
                             .objects
                             .compact

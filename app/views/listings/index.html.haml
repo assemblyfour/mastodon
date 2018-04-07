@@ -15,13 +15,14 @@
       %p Listings are a work in progress. Don't abuse this feature (post too often) otherwise you will be barred from this feature.
 
 
-- @results[:listings].each do |listing|
+- @listings.each do |listing|
   - stream_entry = listing.stream_entry
   - type         = stream_entry.activity_type.downcase
   .activity-stream.activity-stream-headless.h-entry
-    = render partial: "stream_entries/#{type}", locals: { type.to_sym => stream_entry.activity, include_threads: false }
+    .entry
+      = render partial: "stream_entries/simple_status", locals: { status: listing, include_threads: false }
   %br
 
-- if @results[:listings].empty?
+- if @listings.empty?
   .flash-message= "Sorry, your search for '#{params[:query]}' has no results. Try a different search term."
 
