@@ -921,7 +921,14 @@
 
 .status__action-bar-button {
   float: left;
-  margin-right: 18px;
+  margin-right: 6px;
+}
+
+.status__action-bar-counter {
+  float: left;
+  margin-right: 12px;
+  color: #d9e1e8;
+  width: 23.15px;
 }
 
 .status__action-bar-dropdown {
