@@ -12,7 +12,6 @@ class ListingSearchService < BaseService
                        .with_public_visibility
                        .excluding_silenced_accounts
                        .where('statuses.created_at > ?', 7.days.ago)
-                       .where('LOWER(statuses.text) LIKE ?', '%location:%')
                        .order('statuses.created_at DESC')
   end
 
