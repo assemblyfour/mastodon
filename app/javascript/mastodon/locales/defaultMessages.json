@@ -176,6 +176,10 @@
         "id": "status.delete"
       },
       {
+        "defaultMessage": "Direct message @{name}",
+        "id": "status.direct"
+      },
+      {
         "defaultMessage": "Mention @{name}",
         "id": "status.mention"
       },
@@ -1309,6 +1313,10 @@
       {
         "defaultMessage": "Delete",
         "id": "status.delete"
+      },
+      {
+        "defaultMessage": "Direct message @{name}",
+        "id": "status.direct"
       },
       {
         "defaultMessage": "Mention @{name}",
