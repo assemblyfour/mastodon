@@ -5,6 +5,8 @@ class Api::V1::Accounts::CredentialsController < Api::BaseController
   before_action -> { doorkeeper_authorize! :write }, only: [:update]
   before_action :require_user!
 
+  serialization_scope :doorkeeper_token
+
   def show
     @account = current_account
     render json: @account, serializer: REST::CredentialAccountSerializer
