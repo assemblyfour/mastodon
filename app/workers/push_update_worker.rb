@@ -3,6 +3,8 @@
 class PushUpdateWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: 'realtime'
+
   def perform(account_id, status_id, timeline_id = nil)
     account     = Account.find(account_id)
     status      = Status.find(status_id)

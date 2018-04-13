@@ -3,6 +3,8 @@
 class AuthorizeFollowWorker
   include Sidekiq::Worker
 
+  sidekiq_options queue: 'critical'
+
   def perform(source_account_id, target_account_id)
     source_account = Account.find(source_account_id)
     target_account = Account.find(target_account_id)

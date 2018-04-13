@@ -3,7 +3,7 @@
 class WebPushNotificationWorker
   include Sidekiq::Worker
 
-  sidekiq_options backtrace: true
+  sidekiq_options queue: 'realtime', backtrace: true
 
   def perform(session_activation_id, notification_id)
     session_activation = SessionActivation.find(session_activation_id)
