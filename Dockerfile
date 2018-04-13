@@ -42,6 +42,7 @@ RUN apk -U upgrade \
     protobuf \
     tini \
     tzdata \
+    less \
  && update-ca-certificates \
  && mkdir -p /tmp/src /opt \
  && wget -O yarn.tar.gz "https://github.com/yarnpkg/yarn/releases/download/v$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
@@ -79,10 +80,10 @@ RUN bundle config build.nokogiri --with-iconv-lib=/usr/local/lib --with-iconv-in
  && bundle install -j$(getconf _NPROCESSORS_ONLN) --deployment --without test development
 
 
+RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake SECRET_KEY_BASE=fake
+
 COPY . /mastodon
 
-RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake
 
-USER mastodon
 
 ENTRYPOINT ["/sbin/tini", "--"]
