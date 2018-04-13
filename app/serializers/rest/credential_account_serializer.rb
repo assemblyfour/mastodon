@@ -2,7 +2,7 @@
 
 class REST::CredentialAccountSerializer < REST::AccountSerializer
   attributes :source
-  attribute :email, if: -> { scope.scopes.exists?('email') }
+  attribute :email, if: -> { instance_options[:show_email] }
 
   def email
     object.user.email
