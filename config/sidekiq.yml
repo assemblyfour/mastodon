@@ -1,10 +1,12 @@
 ---
-:concurrency: 5
+:concurrency: 15
 :queues:
+  - critical
+  - realtime
+  - mailers
   - default
   - push
   - pull
-  - mailers
 :schedule:
   subscriptions_scheduler:
     cron: '<%= Random.rand(0..59) %> <%= Random.rand(4..6) %> * * *'
