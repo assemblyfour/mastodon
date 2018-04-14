@@ -29,11 +29,21 @@ class SearchService < BaseService
   def perform_statuses_search!
     statuses = StatusesIndex.filter(term: { searchable_by: account.id })
                             .query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed) })
+                            .order(created_at: {order: :desc})
                             .limit(limit)
                             .objects
                             .compact
 
-    statuses.reject { |status| StatusFilter.new(status, account).filtered? }
+    # TODO: merge this with above query
+    public_statuses = StatusesIndex.filter(term: { visibility: 'public' })
+                            .query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed) })
+                            .order(created_at: {order: :desc})
+                            .limit(limit)
+                            .objects
+                            .compact
+
+    statuses = (statuses + public_statuses).compact.uniq
+    statuses.reject { |status| StatusFilter.new(status, account).filtered? }[0...limit]
   end
 
   def perform_hashtags_search!
@@ -61,8 +71,7 @@ class SearchService < BaseService
   end
 
   def full_text_searchable?
-    return false unless Chewy.enabled?
-    !account.nil? && !query.start_with?('#') && query.length > 2
+    Chewy.enabled? && query.length >= 2
   end
 
   def account_searchable?
