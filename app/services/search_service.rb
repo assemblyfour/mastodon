@@ -42,7 +42,7 @@ class SearchService < BaseService
                             .objects
                             .compact
 
-    statuses = (statuses + public_statuses).compact.uniq
+    statuses = (statuses + public_statuses).compact.uniq.sort_by(&:created_at).reverse
     statuses.reject { |status| StatusFilter.new(status, account).filtered? }[0...limit]
   end
 
