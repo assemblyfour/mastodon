@@ -11,7 +11,7 @@ class ListingSearchService < BaseService
                        .without_reblogs
                        .with_public_visibility
                        .excluding_silenced_accounts
-                       .where('statuses.created_at > ?', 7.days.ago)
+                       .where('statuses.created_at > ?', 30.days.ago)
                        .order('statuses.created_at DESC')
   end
 

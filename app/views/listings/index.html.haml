@@ -2,7 +2,7 @@
   %h1 Switter Listings
 
 %p
-  Search #{ListingSearchService.listings.count} Switter listings.
+  Search #{ListingSearchService.listings.count} active Switter listings.
 = form_tag '/', method: 'GET', class: 'simple_form' do
   .fields-group
     .input.string.required
@@ -13,8 +13,8 @@
       = link_to 'Post a listing', %Q|https://switter.at/share?text=#{URI.encode(@placeholder)}|, class: 'button'
 
     .flash-message
-      %p Listings last for 7 days.
-      %p Listings are a work in progress. Don't abuse this feature (post too often) otherwise you will be barred from this feature.
+      %p Listings last for 30 days.
+      %p Listings are a work in progress. Don't abuse this feature (don't post more than twice a day) otherwise your account will be suspended.
 
 
 - @listings.each do |listing|
@@ -28,3 +28,15 @@
 - if @listings.empty?
   .flash-message= "Sorry, your search for '#{params[:query]}' has no results. Try a different search term."
 
+%br
+%br
+%br
+
+= form_tag '/', method: 'GET', class: 'simple_form' do
+  .fields-group
+    .input.string.required
+      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms. For example: Melbourne'
+
+    .actions
+      %button Search
+      = link_to 'Post a listing', %Q|https://switter.at/share?text=#{URI.encode(@placeholder)}|, class: 'button'
