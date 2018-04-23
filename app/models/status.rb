@@ -61,6 +61,7 @@ class Status < ApplicationRecord
   validates :text, presence: true, unless: -> { with_media? || reblog? }
   validates_with StatusLengthValidator
   validates_with SwlistingsValidator
+  validates_with DisallowedHashtagsValidator
   validates :reblog, uniqueness: { scope: :account }, if: :reblog?
 
   default_scope { recent }
