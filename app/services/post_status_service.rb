@@ -13,6 +13,8 @@ class PostStatusService < BaseService
   # @option [Doorkeeper::Application] :application
   # @option [String] :idempotency Optional idempotency key
   # @return [Status]
+
+  LISTING_HASHTAGS = %w{swlisting swlistings}
   def call(account, text, in_reply_to = nil, **options)
     if options[:idempotency].present?
       existing_id = redis.get("idempotency:status:#{account.id}:#{options[:idempotency]}")
@@ -23,6 +25,12 @@ class PostStatusService < BaseService
     status = nil
     text   = options.delete(:spoiler_text) if text.blank? && options[:spoiler_text].present?
     text   = '.' if text.blank? && !media.empty?
+    visibility = options[:visibility] || account.user&.setting_default_privacy
+
+    if account.local?
+      tags = Extractor.extract_hashtags(text)
+      visibility = :unlisted if tags.any? { |tag| LISTING_HASHTAGS.include? tag.downcase }
+    end
 
     ApplicationRecord.transaction do
       status = account.statuses.create!(text: text,
@@ -30,7 +38,7 @@ class PostStatusService < BaseService
                                         thread: in_reply_to,
                                         sensitive: options[:sensitive],
                                         spoiler_text: options[:spoiler_text] || '',
-                                        visibility: options[:visibility] || account.user&.setting_default_privacy,
+                                        visibility: visibility,
                                         language: LanguageDetector.instance.detect(text, account),
                                         application: options[:application])
     end
