@@ -17,8 +17,8 @@ class SwlistingsValidator < ActiveModel::Validator
                                 .joins(:tags)
                                 .where(statuses_tags: { tag: Tag.where(name: 'swlisting') })
 
-    unless swlisting_statuses.count < 2
-      status.errors.add(:text, 'You can only post 2 times per day to #swlisting')
+    unless swlisting_statuses.count < 3
+      status.errors.add(:text, 'You can only post 3 times per day to #swlisting')
     end
   end
 end
