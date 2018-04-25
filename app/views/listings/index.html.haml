@@ -2,7 +2,7 @@
   %h1 Switter Listings
 
 %p
-  Search #{ListingSearchService.listings.count} active Switter listings.
+  Search #{ListingSearchService.listings.count} active Switter listings posted in the last 30 days.
 = form_tag '/', method: 'GET', class: 'simple_form' do
   .fields-group
     .input.string.required
@@ -10,12 +10,7 @@
 
     .actions
       %button Search
-      = link_to 'Post a listing', %Q|https://switter.at/share?text=#{URI.encode(@placeholder)}|, class: 'button'
-
-    .flash-message
-      %p Listings last for 30 days.
-      %p Listings are a work in progress. You can only post 3 listings per 24 hours.
-
+      = link_to 'Post a listing', '/new', class: 'button'
 
 - @listings.each do |listing|
   - stream_entry = listing.stream_entry
@@ -35,8 +30,8 @@
 = form_tag '/', method: 'GET', class: 'simple_form' do
   .fields-group
     .input.string.required
-      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms. For example: Melbourne'
+      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms here. For example: Melbourne'
 
     .actions
       %button Search
-      = link_to 'Post a listing', %Q|https://switter.at/share?text=#{URI.encode(@placeholder)}|, class: 'button'
+      = link_to 'Post a listing', '/new', class: 'button'

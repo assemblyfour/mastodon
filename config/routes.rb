@@ -322,6 +322,8 @@ Rails.application.routes.draw do
 
   constraints subdomain: 'listings' do
     get '/', to: 'listings#index'
+    get '/new', to: 'listings#new'
+    post '/create', to: 'listings#create'
   end
 
   root 'home#index'

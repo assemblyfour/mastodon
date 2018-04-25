@@ -1,0 +1,29 @@
+.compact-header
+  %h1 Post a listing
+
+.flash-message
+  %ul
+    %li Only providers may post a listing.
+    %li Maximum 3 posts in 24 hours.
+    %li You must have an avatar to post a listing.
+
+= form_tag '/create', method: 'POST', class: 'simple_form' do
+  .fields-group
+    .input.string.required.field_with_hint
+      = label_tag 'location', 'Location'
+      = text_field_tag 'location', '', class: 'string required', required: true, placeholder: 'i.e. Melbourne, Australia', maxlength: 50
+      %span.hint Don't abbreviate. Maximum 50 characters.
+    .input.string.required.field_with_hint
+      = label_tag 'contact', 'Contact Details'
+      = text_field_tag 'contact', '', class: 'string required', required: true, placeholder: 'Email, phone or link', maxlength: 100
+      %span.hint Enter your contact details. Maximum 100 characters.
+    .input.string.required.field_with_hint
+      = label_tag 'description', 'Description'
+      = text_area_tag 'description', '', class: 'string required', required: true, placeholder: 'Introduce yourself!', rows: 4, maxlength: 300
+      %span.hint Don't list services. Maximum 300 characters.
+    .flash-message You can upload photos on the next step by clicking the Camera icon. Once you have attached your photos, click 'Toot!'
+    .actions
+      %button Next
+
+
+

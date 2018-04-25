@@ -6,15 +6,23 @@ class ListingsController < ApplicationController
   def index
     @results = ListingSearchService.new.call(params[:query])
     @listings = Status.includes(:media_attachments, :mentions, :stream_entry).where(Status.arel_table[:id].in(@results[:listings].map(&:id)))
-    @placeholder = <<~TEXT
-      [introduce yourself!]
+  end
 
-      Tags: [for example: #GFE #PSE #Massage #Companion]
-      Location: [City, State, Country]
-      Contact: [mobile, email, link]
+  def new
+
+  end
+
+  def create
+    @text = <<~TEXT
+      #{params[:description]}
+
+      Location: #{params[:location]}
+      Contact: #{params[:contact]}
 
       #swlisting
     TEXT
+
+    redirect_to %Q|https://switter.at/share?text=#{URI.encode(@text)}|
   end
 
   private
