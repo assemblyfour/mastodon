@@ -679,6 +679,9 @@ en:
       video:
         one: "%{count} video"
         other: "%{count} videos"
+    disallowed_hashtags:
+      one: "contained a disallowed hashtag: %{tags}"
+      other: "contained the disallowed hashtags: %{tags}"
     content_warning: 'Content warning: %{warning}'
     disallowed_hashtags:
       one: 'contained a disallowed hashtag: %{tags}'

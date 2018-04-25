@@ -60,8 +60,8 @@ class Status < ApplicationRecord
   validates :uri, uniqueness: true, presence: true, unless: :local?
   validates :text, presence: true, unless: -> { with_media? || reblog? }
   validates_with StatusLengthValidator
-  validates_with SwlistingsValidator
   validates_with DisallowedHashtagsValidator
+  validates_with SwlistingsValidator
   validates :reblog, uniqueness: { scope: :account }, if: :reblog?
 
   default_scope { recent }
