@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+Paperclip::DataUriAdapter.register
 Paperclip.options[:read_timeout] = 60
 
 Paperclip.interpolates :filename do |attachment, style|
