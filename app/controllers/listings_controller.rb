@@ -1,11 +1,12 @@
+require 'digest/sha1'
 class ListingsController < ApplicationController
   before_action :set_body_classes
 
   layout 'public'
 
   def index
-    @results = ListingSearchService.new.call(params[:query])
-    @listings = Status.includes(:media_attachments, :mentions, :stream_entry, :account).where(Status.arel_table[:id].in(@results[:listings].map(&:id)))
+    results = ListingSearchService.new.call(params[:query])
+    @listings = Status.includes(:media_attachments, :mentions, :stream_entry, :account).where(Status.arel_table[:id].in(results[:listings].map(&:id)))
   end
 
   def new
