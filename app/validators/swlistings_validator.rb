@@ -7,18 +7,23 @@ class SwlistingsValidator < ActiveModel::Validator
     tags = Extractor.extract_hashtags(status.text)
 
     return unless tags.map(&:downcase).include? 'swlisting'
+    return if status.reply? || status.private_visibility? || status.direct_visibility?
+    return if status.account.user.staff?
 
     unless status.account.avatar?
-      status.errors.add(:text, 'You need a profile picture to post on the #swlisting hashtag')
+      status.errors.add(:base, 'You need a profile picture to post on the #swlisting hashtag')
     end
 
-    swlisting_statuses = Status.where(account: status.account)
+    swlisting_statuses = ::Status.tagged_with(Tag.find_by(name: 'swlisting'))
+                                .where(account: status.account)
+                                .local
+                                .without_replies
+                                .without_reblogs
+                                .excluding_silenced_accounts
                                 .where(Status.arel_table[:created_at].gt(1.day.ago))
-                                .joins(:tags)
-                                .where(statuses_tags: { tag: Tag.where(name: 'swlisting') })
 
     unless swlisting_statuses.count < 3
-      status.errors.add(:text, 'You can only post 3 times per day to #swlisting')
+      status.errors.add(:base, 'You can only post 3 times per day to #swlisting')
     end
   end
 end
