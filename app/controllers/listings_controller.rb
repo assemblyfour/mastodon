@@ -22,7 +22,7 @@ class ListingsController < ApplicationController
       #swlisting
     TEXT
 
-    redirect_to %Q|https://switter.at/share?text=#{URI.encode(@text)}|
+    redirect_to %Q|https://switter.at/share?text=#{CGI.escape(@text)}|
   end
 
   private
