@@ -6,7 +6,7 @@
 = form_tag '/', method: 'GET', class: 'simple_form' do
   .fields-group
     .input.string.required
-      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms. For example: Melbourne'
+      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms here. For example: Melbourne'
 
     .actions
       %button Search
@@ -14,7 +14,7 @@
 
     .flash-message
       %p Listings last for 30 days.
-      %p Listings are a work in progress. Don't abuse this feature (don't post more than twice a day) otherwise your account will be suspended.
+      %p Listings are a work in progress. You can only post 3 listings per 24 hours.
 
 
 - @listings.each do |listing|
