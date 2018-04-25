@@ -13,11 +13,10 @@
       = link_to 'Post a listing', '/new', class: 'button'
 
 - @listings.each do |listing|
-  - stream_entry = listing.stream_entry
-  - type         = stream_entry.activity_type.downcase
-  .activity-stream.activity-stream-headless.h-entry
-    .entry
-      = render partial: "stream_entries/simple_status", locals: { status: listing, include_threads: false }
+  - cache listing do
+    .activity-stream.activity-stream-headless.h-entry
+      .entry
+        = render partial: "stream_entries/simple_status", locals: { status: listing, include_threads: false }
   %br
 
 - if @listings.empty?
