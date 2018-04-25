@@ -13,7 +13,7 @@
       = link_to 'Post a listing', '/new', class: 'button'
 
 - @listings.each do |listing|
-  - cache listing do
+  - cache listing, expires_in: 2.weeks, race_condition_ttl: 1.minute do
     .activity-stream.activity-stream-headless.h-entry
       .entry
         = render partial: "stream_entries/simple_status", locals: { status: listing, include_threads: false }
