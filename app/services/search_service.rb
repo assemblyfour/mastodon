@@ -42,7 +42,14 @@ class SearchService < BaseService
                             .objects
                             .compact
 
-    statuses = (statuses + public_statuses).compact.uniq.sort_by(&:created_at).reverse
+    listings = ListingsIndex.query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed location location.stemmed) })
+                            .limit(RESULTS)
+                            .order(created_at: {order: :desc})
+                            .objects
+                            .compact
+
+
+    statuses = (statuses + public_statuses + listings).compact.uniq.sort_by(&:created_at).reverse
     statuses.reject { |status| StatusFilter.new(status, account).filtered? }[0...limit]
   end
 
