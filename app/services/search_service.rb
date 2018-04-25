@@ -43,7 +43,7 @@ class SearchService < BaseService
                             .compact
 
     listings = ListingsIndex.query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed location location.stemmed) })
-                            .limit(RESULTS)
+                            .limit(limit)
                             .order(created_at: {order: :desc})
                             .objects
                             .compact
