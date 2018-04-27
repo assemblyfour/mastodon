@@ -39,7 +39,7 @@ if ENV['S3_ENABLED'] == 'true'
 
   if ENV.has_key?('S3_CLOUDFRONT_HOST')
     Paperclip::Attachment.default_options.merge!(
-      url: ':s3_alias_url',
+      url: ':fog_public_url',
       fog_host: ENV['S3_CLOUDFRONT_HOST']
     )
   end
