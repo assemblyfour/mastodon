@@ -1,11 +1,22 @@
-.compact-header
-  %h1 Post a listing
+%h1 Post a listing
 
-.flash-message
-  %ul
-    %li Only providers may post a listing.
-    %li Maximum 3 posts in 24 hours.
-    %li You must have an avatar to post a listing.
+%h3 Rules
+%ul
+  %li Only providers may post a listing.
+  %li Maximum 3 posts in 24 hours.
+  %li You must have an avatar to post a listing.
+  %li You may include photos in your advertisements, but please remember to use sensitive content/CW warnings on any explicit nudity/NSFW photos.
+  %li You may not place an ad for anyone other than yourself. (If you work with a duo partner, you will both need to give consent in order to post duo ads. Both providers should be tagged in any duo advertisements.)
+  %li You may not use any racist or discriminatory language in your listings. (If there are clients you are not willing to see, you may decide this during screening.)
+  %li You may not use any explicit language or acronyms to refer to specific sexual services. (ie: BBBJ, FS, DATY) Please emphasize that you are offering your time and companionship; if clients have specific questions about things you do/do not offer, please answer these questions during the screening process.
+  %li You may not advertise anything related to bareback/BBFS services.
+  %li You may not advertise using language that could be misconstrued as an ad for underage/child services. (This means avoiding terms like "young"/"tween"/"high school.")
+%br
+%br
+%style
+  h1 { font-size: 2em; font-weight: bold; color: #9baec8; margin-bottom: 1em }
+  h3 { font-size: 1.7em; font-weight: bold; margin-bottom: 1em; color: #9baec8 }
+  ul li { list-style-type: square; margin-left: 1.2em }
 
 = form_tag '/create', method: 'POST', class: 'simple_form' do
   .fields-group
