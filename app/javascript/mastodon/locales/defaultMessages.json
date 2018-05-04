@@ -529,7 +529,7 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "column.community"
       },
       {
@@ -831,7 +831,7 @@
         "id": "navigation_bar.public_timeline"
       },
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "navigation_bar.community_timeline"
       },
       {
@@ -903,7 +903,7 @@
         "id": "column_subheading.settings"
       },
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "navigation_bar.community_timeline"
       },
       {
@@ -1528,7 +1528,7 @@
         "id": "column.notifications"
       },
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "column.community"
       },
       {

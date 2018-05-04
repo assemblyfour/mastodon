@@ -18,7 +18,7 @@ const messages = defineMessages({
   public_timeline: { id: 'navigation_bar.public_timeline', defaultMessage: 'Federated timeline' },
   navigation_subheading: { id: 'column_subheading.navigation', defaultMessage: 'Navigation' },
   settings_subheading: { id: 'column_subheading.settings', defaultMessage: 'Settings' },
-  community_timeline: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
+  community_timeline: { id: 'navigation_bar.community_timeline', defaultMessage: 'Community timeline' },
   preferences: { id: 'navigation_bar.preferences', defaultMessage: 'Preferences' },
   follow_requests: { id: 'navigation_bar.follow_requests', defaultMessage: 'Follow requests' },
   sign_out: { id: 'navigation_bar.logout', defaultMessage: 'Logout' },
