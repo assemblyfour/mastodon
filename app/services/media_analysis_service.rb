@@ -10,7 +10,7 @@ class MediaAnalysisService < BaseService
                 headers: {
                   "Content-Type" => "application/json",
                 },
-                body: JSON.dump({url: media_attachment.file.url})
+                body: JSON.dump({url: media_attachment.file.url(:small)})
               )
     nudity_level = JSON.parse(response.body).fetch('nude')
     meta = media_attachment.file.instance_read(:meta).merge(nudity_level: nudity_level)
