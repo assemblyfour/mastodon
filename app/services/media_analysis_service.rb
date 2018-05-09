@@ -3,8 +3,10 @@
 class MediaAnalysisService < BaseService
   NUDEBOX_URL = ENV.fetch('NUDEBOX_URL', nil)
 
+  NUDITY_THRESHOLD = 0.9
   def call(media_attachment)
     return if media_attachment.remote_url.present?
+    return if media_attachment.status && media_attachment.status.sensitive
     return unless NUDEBOX_URL
     response = Excon.post(NUDEBOX_URL,
                 headers: {
@@ -17,7 +19,7 @@ class MediaAnalysisService < BaseService
     media_attachment.file.instance_write(:meta, meta)
     media_attachment.save!
 
-    if media_attachment.status
+    if media_attachment.status && nudity_level >= NUDITY_THRESHOLD
       media_attachment.status.update!(sensitive: true)
     end
   end

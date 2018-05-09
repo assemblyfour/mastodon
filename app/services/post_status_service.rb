@@ -15,7 +15,6 @@ class PostStatusService < BaseService
   # @return [Status]
 
   LISTING_HASHTAGS = %w{swlisting swlistings}
-  NUDITY_THRESHOLD = 0.9
   def call(account, text, in_reply_to = nil, **options)
     if options[:idempotency].present?
       existing_id = redis.get("idempotency:status:#{account.id}:#{options[:idempotency]}")
@@ -34,7 +33,7 @@ class PostStatusService < BaseService
       visibility = :unlisted if tags.any? { |tag| LISTING_HASHTAGS.include? tag.downcase }
     end
 
-    if media && media.any? { |m| m.file_meta.fetch('nudity_level', 0) >= NUDITY_THRESHOLD }
+    if media && media.any? { |m| m.file_meta.fetch('nudity_level', 0) >= MediaAnalysisService::NUDITY_THRESHOLD }
       sensitive = true
     end
 
