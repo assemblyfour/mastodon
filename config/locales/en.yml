@@ -168,6 +168,7 @@ en:
         resolve_report: "%{name} resolved report %{target}"
         silence_account: "%{name} silenced %{target}'s account"
         suspend_account: "%{name} suspended %{target}'s account"
+        temp_suspend_account: "%{name} temporarily suspended %{target}'s account"
         unassigned_report: "%{name} unassigned report %{target}"
         unsilence_account: "%{name} unsilenced %{target}'s account"
         unsuspend_account: "%{name} unsuspended %{target}'s account"

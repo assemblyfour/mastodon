@@ -3,7 +3,6 @@
 #
 # Table name: media_attachments
 #
-#  id                :integer          not null, primary key
 #  status_id         :integer
 #  file_file_name    :string
 #  file_content_type :string
@@ -16,6 +15,7 @@
 #  type              :integer          default("image"), not null
 #  file_meta         :json
 #  account_id        :integer
+#  id                :integer          not null, primary key
 #  description       :text
 #
 

@@ -4,16 +4,6 @@
 - content_for :page_title do
   = t('admin.reports.report', id: @report.id)
 
-%div{ style: 'overflow: hidden; margin-bottom: 20px' }
-  - if @report.unresolved?
-    %div{ style: 'float: right' }
-      = link_to t('admin.reports.silence_account'), admin_report_path(@report, outcome: 'silence'), method: :put, class: 'button'
-      = link_to t('admin.reports.suspend_account'), admin_report_path(@report, outcome: 'suspend'), method: :put, class: 'button'
-    %div{ style: 'float: left' }
-      = link_to t('admin.reports.mark_as_resolved'), admin_report_path(@report, outcome: 'resolve'), method: :put, class: 'button'
-  - else
-    = link_to t('admin.reports.mark_as_unresolved'), admin_report_path(@report, outcome: 'reopen'), method: :put, class: 'button'
-
 .table-wrapper
   %table.table.inline-table
     %tbody
@@ -99,6 +89,27 @@
 
 %hr{ class: "section-break"}/
 
+%div{ style: 'overflow: hidden; margin-bottom: 20px' }
+  - if @report.unresolved?
+    %div{ style: 'float: right' }
+      = link_to t('admin.reports.silence_account'), admin_report_path(@report, outcome: 'silence'), method: :put, class: 'button'
+      = link_to 'Delete Account' || t('admin.reports.suspend_account'), admin_report_path(@report, outcome: 'suspend'), method: :put, class: 'button', data: {confirm: 'Are you sure you want to destroy this account? This action is not reversible.'}
+      %br
+      %br
+        %h4 Temp Suspend
+        = simple_form_for Admin::TempSuspend.new, url: admin_report_path(@report, outcome: 'temp_suspend'), method: :put do |f|
+          = f.input :days, placeholder: 'Duration in Days', required: true
+          = f.input :reason, placeholder: 'Reason displayed to user', required: true
+          = f.submit 'Temp Suspend', class: 'button'
+
+    %div{ style: 'float: left' }
+      = link_to t('admin.reports.mark_as_resolved'), admin_report_path(@report, outcome: 'resolve'), method: :put, class: 'button'
+
+  - else
+    = link_to t('admin.reports.mark_as_unresolved'), admin_report_path(@report, outcome: 'reopen'), method: :put, class: 'button'
+    = link_to t('admin.reports.unsuspend_account'), admin_report_path(@report, outcome: 'undo_temp_suspend'), method: :put, class: 'button' if (suspended_until = @report.target_account.suspended_until) && suspended_until > Time.now
+
+
 %h3= t('admin.reports.notes.label')
 
 - if @report_notes.length > 0
@@ -116,6 +127,7 @@
     - else
       = f.submit t('admin.reports.notes.create_and_unresolve'), name: :create_and_unresolve, class: 'button report-note__button'
     = f.submit t('admin.reports.notes.create'), class: 'button report-note__button'
+
 
 - if @report_history.length > 0
   %h3= t('admin.reports.history')

@@ -3,7 +3,6 @@
 #
 # Table name: accounts
 #
-#  id                      :integer          not null, primary key
 #  username                :string           default(""), not null
 #  domain                  :string
 #  secret                  :string           default(""), not null
@@ -41,9 +40,12 @@
 #  shared_inbox_url        :string           default(""), not null
 #  followers_url           :string           default(""), not null
 #  protocol                :integer          default("ostatus"), not null
+#  id                      :integer          not null, primary key
 #  memorial                :boolean          default(FALSE), not null
 #  moved_to_account_id     :integer
 #  featured_collection_url :string
+#  suspended_until         :datetime
+#  suspension_reason       :text
 #
 
 class Account < ApplicationRecord

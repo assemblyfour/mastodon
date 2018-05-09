@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 module Admin
+  class TempSuspend
+    include ActiveModel::Model
+    attr_accessor :days, :reason
+  end
+
   class ReportsController < BaseController
     before_action :set_report, except: [:index]
 
@@ -44,6 +49,19 @@ module Admin
       when 'resolve'
         @report.resolve!(current_account)
         log_action :resolve, @report
+      when 'temp_suspend'
+        @report.resolve!(current_account)
+        log_action :resolve, @report
+        log_action :temp_suspend, @report.target_account
+        days = params[:admin_temp_suspend][:days].to_i
+        reason = params[:admin_temp_suspend][:reason]
+        @report.target_account.update!(suspended_until: days.days.from_now, suspension_reason: reason)
+        @current_account.report_notes.create!(report: @report, content: "Temporarily suspend account for #{days} days for: #{reason}")
+      when 'undo_temp_suspend'
+        log_action :unsuspend_account, @report.target_account
+        @report.target_account.update!(suspended_until: nil, suspension_reason: nil)
+        @current_account.report_notes.create!(report: @report, content: "Unsuspended account.")
+
       when 'suspend'
         Admin::SuspensionWorker.perform_async(@report.target_account.id)
 
