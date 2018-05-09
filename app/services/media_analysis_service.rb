@@ -16,5 +16,9 @@ class MediaAnalysisService < BaseService
     meta = media_attachment.file.instance_read(:meta).merge(nudity_level: nudity_level)
     media_attachment.file.instance_write(:meta, meta)
     media_attachment.save!
+
+    if media_attachment.status
+      media_attachment.status.update!(sensitive: true)
+    end
   end
 end
