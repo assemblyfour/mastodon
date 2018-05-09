@@ -14,4 +14,6 @@ cache_namespace = namespace ? namespace + '_cache' : 'cache'
 REDIS_CACHE_PARAMS = {
   expires_in: 10.minutes,
   namespace: cache_namespace,
+  pool: ENV.fetch('MAX_THREADS', 5).to_i,
+  timeout: 2,
 }.freeze
