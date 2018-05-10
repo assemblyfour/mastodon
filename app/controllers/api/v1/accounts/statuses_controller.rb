@@ -30,7 +30,7 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
     default_statuses.tap do |statuses|
       statuses.merge!(only_media_scope) if truthy_param?(:only_media)
       statuses.merge!(pinned_scope) if truthy_param?(:pinned)
-      statuses.merge!(no_replies_scope) if truthy_param?(:exclude_replies)
+      statuses.merge!(no_replies_scope).merge!(no_reblogs_scope) if truthy_param?(:exclude_replies)
     end
   end
 
@@ -43,7 +43,7 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   end
 
   def permitted_account_statuses
-    @account.statuses.permitted_for(@account, current_account).where(reblog_of_id: nil)
+    @account.statuses.permitted_for(@account, current_account)
   end
 
   def only_media_scope
@@ -66,6 +66,10 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
 
   def no_replies_scope
     Status.without_replies
+  end
+
+  def no_reblogs_scope
+    Status.without_reblogs
   end
 
   def pagination_params(core_params)
