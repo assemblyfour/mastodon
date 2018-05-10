@@ -43,7 +43,7 @@ class Api::V1::Accounts::StatusesController < Api::BaseController
   end
 
   def permitted_account_statuses
-    @account.statuses.permitted_for(@account, current_account)
+    @account.statuses.permitted_for(@account, current_account).where(reblog_of_id: nil)
   end
 
   def only_media_scope
