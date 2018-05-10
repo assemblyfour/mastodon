@@ -15,6 +15,11 @@
     %ul
       %li= link_to t('admin.statuses.no_media'), admin_account_statuses_path(@account.id, current_params.merge(media: nil)), class: !params[:media] && 'selected'
       %li= link_to t('admin.statuses.with_media'), admin_account_statuses_path(@account.id, current_params.merge(media: true)), class: params[:media] && 'selected'
+  .filter-subset
+    %strong= t('admin.statuses.boosts')
+    %ul
+      %li= link_to t('admin.statuses.no_boosts'), admin_account_statuses_path(@account.id, current_params.merge(with_boosts: nil)), class: !params[:with_boosts] && 'selected'
+      %li= link_to t('admin.statuses.with_boosts'), admin_account_statuses_path(@account.id, current_params.merge(with_boosts: true)), class: params[:with_boosts] && 'selected'
 
 - if @statuses.empty?
   .accounts-grid
