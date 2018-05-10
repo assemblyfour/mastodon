@@ -3,9 +3,6 @@ FROM ruby:2.4.3-alpine3.6
 LABEL maintainer="https://github.com/tootsuite/mastodon" \
       description="Your self-hosted, globally interconnected microblogging community"
 
-ARG UID=991
-ARG GID=0
-
 ENV RAILS_SERVE_STATIC_FILES=true \
     RAILS_ENV=production NODE_ENV=production
 
@@ -63,9 +60,7 @@ RUN apk -U upgrade \
  && cd /mastodon \
  && rm -rf /tmp/* /var/cache/apk/*
 
-RUN addgroup -g ${GID} mastodon && adduser -h /mastodon -s /bin/sh -D -G mastodon -u ${UID} mastodon \
- && mkdir -p /mastodon/public/system /mastodon/public/assets /mastodon/public/packs \
- && chown -R mastodon:mastodon /mastodon/public
+RUN mkdir -p /mastodon/public/system /mastodon/public/assets /mastodon/public/packs
 
 RUN gem install foreman
 
