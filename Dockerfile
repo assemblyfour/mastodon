@@ -4,7 +4,7 @@ LABEL maintainer="https://github.com/tootsuite/mastodon" \
       description="Your self-hosted, globally interconnected microblogging community"
 
 ARG UID=991
-ARG GID=991
+ARG GID=0
 
 ENV RAILS_SERVE_STATIC_FILES=true \
     RAILS_ENV=production NODE_ENV=production
@@ -100,5 +100,9 @@ COPY app/views/layouts/error.html.haml /mastodon/app/views/layouts/
 RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake SECRET_KEY_BASE=fake
 
 COPY . /mastodon
+
+RUN chgrp -R 0 /mastodon
+RUN chmod -R g+rw /mastodon
+RUN find /mastodon -type d -exec chmod g+x {} +
 
 ENTRYPOINT ["/sbin/tini", "--"]
