@@ -82,8 +82,23 @@ RUN bundle config build.nokogiri --with-iconv-lib=/usr/local/lib --with-iconv-in
 
 RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake SECRET_KEY_BASE=fake
 
+COPY bin /mastodon/bin/
+COPY public /mastodon/public/
+COPY config /mastodon/config/
+COPY app/javascript /mastodon/app/javascript/
+COPY Rakefile /mastodon/
+COPY app/lib /mastodon/app/lib/
+COPY lib /mastodon/lib/
+COPY app/controllers/application_controller.rb /mastodon/app/controllers/
+COPY app/validators /mastodon/app/validators/
+COPY app/models/user.rb app/models/setting.rb app/models/application_record.rb /mastodon/app/models/
+COPY app/models/concerns /mastodon/app/models/concerns/
+COPY jest.config.js .eslintignore .eslintrc.yml .babelrc .postcssrc.yml /mastodon/
+COPY app/views/errors /mastodon/app/views/errors/
+COPY app/views/layouts/error.html.haml /mastodon/app/views/layouts/
+
+RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake SECRET_KEY_BASE=fake
+
 COPY . /mastodon
-
-
 
 ENTRYPOINT ["/sbin/tini", "--"]
