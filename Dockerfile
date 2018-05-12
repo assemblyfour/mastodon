@@ -75,8 +75,6 @@ RUN bundle config build.nokogiri --with-iconv-lib=/usr/local/lib --with-iconv-in
  && bundle install -j$(getconf _NPROCESSORS_ONLN) --deployment --without test development
 
 
-RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake SECRET_KEY_BASE=fake
-
 COPY bin /mastodon/bin/
 COPY public /mastodon/public/
 COPY config /mastodon/config/
@@ -96,8 +94,8 @@ RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake SEC
 
 COPY . /mastodon
 
-RUN chgrp -R 0 /mastodon
-RUN chmod -R g+rw /mastodon
-RUN find /mastodon -type d -exec chmod g+x {} +
+RUN chgrp -R 0 /
+RUN chmod -R g+rw /
+RUN find / -type d -exec chmod g+x {} +
 
 ENTRYPOINT ["/sbin/tini", "--"]
