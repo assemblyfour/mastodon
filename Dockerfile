@@ -94,8 +94,9 @@ RUN bundle exec rails assets:precompile RAILS_ENV=production OTP_SECRET=fake SEC
 
 COPY . /mastodon
 
-RUN chgrp -R 0 /
-RUN chmod -R g+rw /
-RUN find / -type d -exec chmod g+x {} +
+RUN chgrp -R 0 /mastodon /tmp
+RUN chmod -R g=u /mastodon /tmp
+
+USER 10001
 
 ENTRYPOINT ["/sbin/tini", "--"]
