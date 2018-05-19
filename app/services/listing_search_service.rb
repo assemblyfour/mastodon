@@ -21,6 +21,13 @@ class ListingSearchService < BaseService
     default_results.tap do |results|
       if query.blank?
         results[:listings] = all_listings
+                              .group_by { |s| s.account }
+                              .map { |account, statuses|
+                                statuses.sort_by(&:created_at).last
+                              }
+                              .flatten
+                              .sort_by(&:created_at).reverse[0...RESULTS]
+
       else
         results[:listings] = perform_listing_search!
       end
@@ -35,10 +42,16 @@ class ListingSearchService < BaseService
 
   def perform_listing_search!
      ListingsIndex.query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed location location.stemmed) })
-                            .limit(RESULTS)
+                            .limit(RESULTS * 2)
                             .order(created_at: {order: :desc})
                             .objects
                             .compact
+                            .group_by { |s| s.account }
+                            .map { |account, statuses|
+                              statuses.sort_by(&:created_at).last
+                            }
+                            .flatten
+                            .sort_by(&:created_at).reverse[0...RESULTS]
   end
 
   def default_results
