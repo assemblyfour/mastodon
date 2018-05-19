@@ -54,6 +54,16 @@
       = fa_icon('star')
       %span= status.favourites_count
 
+    - conversations = status.conversation.statuses.count
+    - if conversations > 1
+      ·
+      %span<
+        = fa_icon('comments')
+        %span= conversations - 1
+
     - if user_signed_in?
       ·
-      = link_to t('statuses.open_in_web'), web_url("statuses/#{status.id}"), class: 'open-in-web-link', target: '_blank'
+      = link_to t('statuses.reply'), web_url("statuses/#{status.id}"), class: 'open-in-web-link', target: '_blank'
+    - else
+      ·
+      = link_to t('statuses.reply'), TagManager.instance.url_for(status), class: 'open-in-web-link'

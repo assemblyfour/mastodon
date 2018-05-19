@@ -1,0 +1,20 @@
+.compact-header
+  %h1 Popular Toots
+
+- @popular.each do |status|
+  - cache status, expires_in: 1.second, race_condition_ttl: 1.minute do
+    .activity-stream.activity-stream-headless.h-entry
+      .entry
+        = render partial: "stream_entries/detailed_status", locals: { status: status, include_threads: false }
+  %br
+
+.links
+  - if @page > 1
+    = link_to 'Previous', {page: @page - 1}, class: 'button'
+  - else
+    %br
+  = link_to 'Next', {page: @page + 1}, class: 'button'
+
+:css
+  .links { display: flex; justify-content: space-between }
+  .links > * { flex: 1; max-width: 100px }
