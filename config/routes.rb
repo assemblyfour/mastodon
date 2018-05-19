@@ -317,6 +317,8 @@ Rails.application.routes.draw do
   get '/web/(*any)', to: 'home#index', as: :web
 
   get '/popular', to: 'popular#index'
+  get '/popular/week', to: 'popular#by_week'
+  get '/popular/month', to: 'popular#by_month'
 
   get '/about',      to: 'about#show'
   get '/about/more', to: 'about#more'

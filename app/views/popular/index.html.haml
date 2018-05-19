@@ -1,6 +1,8 @@
 .compact-header
-  %h1 Popular Toots
-
+  %h1= "Popular Toots By #{@period.to_s.titlecase}"
+  = link_to 'By Day', '/popular', class: 'button'
+  = link_to 'By Week', '/popular/week', class: 'button'
+  = link_to 'By Month', '/popular/month', class: 'button'
 .links
   - if @page > 1
     = link_to 'Newer', {page: @page - 1}, class: 'button'
