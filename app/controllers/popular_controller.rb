@@ -34,8 +34,8 @@ class PopularController < ApplicationController
   end
 
   REBLOG_WEIGHTING = 1
-  FAVOURITE_WEIGHTING = 1
-  CONVERSATION_WEIGHTING = 2
+  FAVOURITE_WEIGHTING = 0.7
+  CONVERSATION_WEIGHTING = 3
   def fetch_popular(period:)
     raise ArgumentError unless [:day, :week, :month].include?(period)
     expires = 1.send(period) * 0.005
