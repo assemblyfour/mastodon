@@ -16,7 +16,7 @@ class PopularController < ApplicationController
             .sort_by { |s|
               s.reblogs_count * REBLOG_WEIGHTING +
               s.favourites_count * FAVOURITE_WEIGHTING +
-              s.conversation.statuses.without_reblogs.count * CONVERSATION_WEIGHTING
+              s.conversation.statuses.pluck(:account_id).uniq.count * CONVERSATION_WEIGHTING
             }
             .reject { |s| s.text =~ /\d\d\d.?\d\d\d.?\d\d\d\d/ }
             .reverse[0...25]
