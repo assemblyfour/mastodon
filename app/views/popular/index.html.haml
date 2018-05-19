@@ -1,13 +1,12 @@
 .compact-header
   %h1 Popular Toots
 
-- cache "popular/#{@page}", expires_in: 5.minutes, race_condition_ttl: 10.seconds do
-  - @popular.each do |status|
-    - cache status, expires_in: 5.minutes, race_condition_ttl: 5.seconds do
-      .activity-stream.activity-stream-headless.h-entry
-        .entry
-          = render partial: "stream_entries/detailed_status", locals: { status: status, include_threads: false }
-    %br
+- @popular.each do |status|
+  - cache status, expires_in: 5.minutes, race_condition_ttl: 5.seconds do
+    .activity-stream.activity-stream-headless.h-entry
+      .entry
+        = render partial: "stream_entries/detailed_status", locals: { status: status, include_threads: false }
+  %br
 
 .links
   - if @page > 1
