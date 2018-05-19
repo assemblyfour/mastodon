@@ -13,13 +13,13 @@ class PopularController < ApplicationController
                 .where('reblogs_count + favourites_count > ?', threshold)
                 .where('created_at BETWEEN ? AND ?', page.days.ago, (page - 1).days.ago)
                 .reorder('reblogs_count + favourites_count DESC')
-                .limit(25)
+                .limit(100)
                 .sort_by { |s|
                   s.reblogs_count * REBLOG_WEIGHTING +
                   s.favourites_count * FAVOURITE_WEIGHTING +
-                  s.conversation.statuses.count * CONVERSATION_WEIGHTING
+                  s.conversation.statuses.without_reblogs.count * CONVERSATION_WEIGHTING
                 }
-                .reverse
+                .reverse[0...25]
     @page = page
   end
 
