@@ -3,7 +3,7 @@
 class MediaAnalysisService < BaseService
   NUDEBOX_URL = ENV.fetch('NUDEBOX_URL', nil)
 
-  NUDITY_THRESHOLD = 0.9
+  NUDITY_THRESHOLD = 0.95
   def call(media_attachment)
     return if media_attachment.remote_url.present?
     return if media_attachment.status && media_attachment.status.sensitive
