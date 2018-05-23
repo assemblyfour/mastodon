@@ -70,4 +70,19 @@ class Rack::Attack
 
     [429, headers, [{ error: I18n.t('errors.429') }.to_json]]
   end
+
+  (ENV['BLOCK_IPS'] || '').split(',').each do |ip|
+    begin
+      IPAddr.new(ip)
+      blocklist_ip(ip)
+    rescue IPAddr::InvalidAddressError
+      Rails.logger.error("Invalid IP for blocklist: #{ip}")
+    end
+  end
+
+  self.blocklisted_response = lambda do |env|
+    # Using 503 because it may make attacker think that they have successfully
+    # DOSed the site. Rack::Attack returns 403 for blocklists by default
+    [ 423, {}, ['Locked']]
+  end
 end
