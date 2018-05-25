@@ -148,4 +148,22 @@ class ApplicationController < ActionController::Base
   def skip_session!
     request.session_options[:skip] = true
   end
+
+  def log_context
+    base = {
+      request: {
+        ip:         request.remote_ip,
+        path:       request.path,
+        controller: controller_name,
+        action:     action_name,
+        user_agent: request.user_agent,
+      },
+    }
+    base.merge!(user: current_user.try!(:log_context) || {})
+  end
+
+  def append_info_to_payload(payload)
+    super
+    payload.merge!(log_context)
+  end
 end

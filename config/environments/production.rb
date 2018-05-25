@@ -66,6 +66,17 @@ Rails.application.configure do
 
   # Better log formatting
   config.lograge.enabled = true
+  config.lograge.logger = Log16.new(Logger.new(STDOUT), options: {severity: Logger::INFO, timestamp_key: :@timestamp, message_key: :message})
+  config.lograge.log_level = :log
+  IGNORED_FIELDS = %w(headers params)
+  config.lograge.custom_options = lambda do |event|
+    level = event.payload.fetch(:status, 500) >= 400 ? 'error' : 'debug'
+    payload = event.payload
+    msg = "#{payload.fetch(:method)} #{payload.fetch(:path)}"
+    {log_level: level, timestamp: event.time.iso8601(3), msg: msg}.merge(event.payload).reject { |k, v| IGNORED_FIELDS.include?(k.to_s) }
+  end
+  config.lograge.formatter = Lograge::Formatters::Raw.new
+  config.lograge.ignore_actions = ['HealthController#check']
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
