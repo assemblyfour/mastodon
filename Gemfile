@@ -135,6 +135,7 @@ group :development do
 end
 
 group :production do
+  gem 'log16', git: 'https://github.com/chendo/log16.git'
   gem 'lograge', '~> 0.7'
   gem 'redis-rails', '~> 5.0'
 end
