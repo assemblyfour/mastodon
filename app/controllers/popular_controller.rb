@@ -48,12 +48,23 @@ class PopularController < ApplicationController
             .where('reblogs_count + favourites_count > ?', threshold)
             .where('created_at BETWEEN ? AND ?', page.send(period).ago, (page - 1).send(period).ago)
             .reorder('reblogs_count + favourites_count DESC')
+            .limit(100)
+            .group_by { |s| s.account }
+            .map { |account, statuses|
+              # get the top 3 toots by user to prevent a popular user hogging it all
+              statuses.sort_by { |s|
+                s.reblogs_count * REBLOG_WEIGHTING +
+                s.favourites_count * FAVOURITE_WEIGHTING +
+                s.conversation.statuses.pluck(:account_id).uniq.count * CONVERSATION_WEIGHTING
+              }
+              .reject { |s| s.text =~ /(\d\d\d.{0,2}\d\d\d.?\d\d\d\d)/ }[0...3]
+            }
+            .flatten
             .sort_by { |s|
               s.reblogs_count * REBLOG_WEIGHTING +
               s.favourites_count * FAVOURITE_WEIGHTING +
               s.conversation.statuses.pluck(:account_id).uniq.count * CONVERSATION_WEIGHTING
             }
-            .reject { |s| s.text =~ /\d\d\d.?\d\d\d.?\d\d\d\d/ }
             .reverse[0...25]
     end
   end
