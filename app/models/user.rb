@@ -303,6 +303,10 @@ class User < ApplicationRecord
     super
   end
 
+  def log_context
+    {user_id: id}
+  end
+
   protected
 
   def send_devise_notification(notification, *args)

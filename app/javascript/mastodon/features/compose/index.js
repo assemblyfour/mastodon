@@ -19,14 +19,14 @@ const messages = defineMessages({
   home_timeline: { id: 'tabs_bar.home', defaultMessage: 'Home' },
   notifications: { id: 'tabs_bar.notifications', defaultMessage: 'Notifications' },
   public: { id: 'navigation_bar.public_timeline', defaultMessage: 'Federated timeline' },
-  community: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
+  community: { id: 'navigation_bar.community_timeline', defaultMessage: 'Community timeline' },
   preferences: { id: 'navigation_bar.preferences', defaultMessage: 'Preferences' },
   logout: { id: 'navigation_bar.logout', defaultMessage: 'Logout' },
 });
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, ownProps) => ({
   columns: state.getIn(['settings', 'columns']),
-  showSearch: state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']),
+  showSearch: ownProps.multiColumn ? state.getIn(['search', 'submitted']) && !state.getIn(['search', 'hidden']) : ownProps.isSearchPage,
 });
 
 @connect(mapStateToProps)
@@ -38,6 +38,7 @@ export default class Compose extends React.PureComponent {
     columns: ImmutablePropTypes.list.isRequired,
     multiColumn: PropTypes.bool,
     showSearch: PropTypes.bool,
+    isSearchPage: PropTypes.bool,
     intl: PropTypes.object.isRequired,
   };
 
@@ -58,7 +59,7 @@ export default class Compose extends React.PureComponent {
   }
 
   render () {
-    const { multiColumn, showSearch, intl } = this.props;
+    const { multiColumn, showSearch, isSearchPage, intl } = this.props;
 
     let header = '';
 
@@ -89,7 +90,7 @@ export default class Compose extends React.PureComponent {
       <div className='drawer'>
         {header}
 
-        <SearchContainer />
+        {(multiColumn || isSearchPage) && <SearchContainer /> }
 
         <div className='drawer__pager'>
           <div className='drawer__inner' onFocus={this.onFocus}>
@@ -102,7 +103,7 @@ export default class Compose extends React.PureComponent {
             )}
           </div>
 
-          <Motion defaultStyle={{ x: -100 }} style={{ x: spring(showSearch ? 0 : -100, { stiffness: 210, damping: 20 }) }}>
+          <Motion defaultStyle={{ x: isSearchPage ? 0 : -100 }} style={{ x: spring(showSearch || isSearchPage ? 0 : -100, { stiffness: 210, damping: 20 }) }}>
             {({ x }) => (
               <div className='drawer__inner darker' style={{ transform: `translateX(${x}%)`, visibility: x === -100 ? 'hidden' : 'visible' }}>
                 <SearchResultsContainer />

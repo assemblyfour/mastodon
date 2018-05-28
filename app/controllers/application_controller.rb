@@ -39,11 +39,11 @@ class ApplicationController < ActionController::Base
   end
 
   def require_admin!
-    redirect_to root_path unless current_user&.admin?
+    forbidden unless current_user&.admin?
   end
 
   def require_staff!
-    redirect_to root_path unless current_user&.staff?
+    forbidden unless current_user&.staff?
   end
 
   def check_suspension
@@ -147,5 +147,23 @@ class ApplicationController < ActionController::Base
 
   def skip_session!
     request.session_options[:skip] = true
+  end
+
+  def log_context
+    base = {
+      request: {
+        ip:         request.remote_ip,
+        path:       request.path,
+        controller: controller_name,
+        action:     action_name,
+        user_agent: request.user_agent,
+      },
+    }
+    base.merge!(user: current_user.try!(:log_context) || {})
+  end
+
+  def append_info_to_payload(payload)
+    super
+    payload.merge!(log_context)
   end
 end

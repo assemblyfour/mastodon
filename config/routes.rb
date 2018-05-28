@@ -8,6 +8,8 @@ Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
 Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: 'letter_opener' if Rails.env.development?
 
+  get '__health', to: 'health#check'
+
   authenticate :user, lambda { |u| u.admin? } do
     mount Sidekiq::Web, at: 'sidekiq', as: :sidekiq
     mount PgHero::Engine, at: 'pghero', as: :pghero
@@ -137,6 +139,8 @@ Rails.application.routes.draw do
       resources :reported_statuses, only: [:create, :update, :destroy]
     end
 
+    resources :report_notes, only: [:create, :destroy]
+
     resources :accounts, only: [:index, :show] do
       member do
         post :subscribe
@@ -144,9 +148,11 @@ Rails.application.routes.draw do
         post :enable
         post :disable
         post :redownload
+        post :remove_avatar
         post :memorialize
       end
 
+      resource :change_email, only: [:show, :update]
       resource :reset, only: [:create]
       resource :silence, only: [:create, :destroy]
       resource :suspension, only: [:create, :destroy]
@@ -310,9 +316,19 @@ Rails.application.routes.draw do
 
   get '/web/(*any)', to: 'home#index', as: :web
 
+  get '/popular', to: 'popular#index'
+  get '/popular/week', to: 'popular#by_week'
+  get '/popular/month', to: 'popular#by_month'
+
   get '/about',      to: 'about#show'
   get '/about/more', to: 'about#more'
   get '/terms',      to: 'about#terms'
+
+  constraints subdomain: 'listings' do
+    get '/', to: 'listings#index'
+    get '/new', to: 'listings#new'
+    post '/create', to: 'listings#create'
+  end
 
   root 'home#index'
 

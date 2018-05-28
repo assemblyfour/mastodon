@@ -3,7 +3,6 @@
 #
 # Table name: media_attachments
 #
-#  id                :integer          not null, primary key
 #  status_id         :integer
 #  file_file_name    :string
 #  file_content_type :string
@@ -16,6 +15,7 @@
 #  type              :integer          default("image"), not null
 #  file_meta         :json
 #  account_id        :integer
+#  id                :integer          not null, primary key
 #  description       :text
 #
 
@@ -114,6 +114,7 @@ class MediaAttachment < ApplicationRecord
   before_create :set_shortcode
   before_post_process :set_type_and_extension
   before_save :set_meta
+  after_commit :queue_media_analysis, on: :create
 
   class << self
     private
@@ -184,6 +185,10 @@ class MediaAttachment < ApplicationRecord
     meta = populate_meta
     return if meta == {}
     file.instance_write :meta, meta
+  end
+
+  def queue_media_analysis
+    MediaAnalysisWorker.perform_async(self.id)
   end
 
   def populate_meta

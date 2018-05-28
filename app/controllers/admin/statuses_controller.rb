@@ -12,13 +12,16 @@ module Admin
     def index
       authorize :status, :index?
 
-      @statuses = @account.statuses
+      @statuses = if params[:with_boosts]
+        @account.statuses.where(visibility: [:public, :unlisted])
+      else
+        @account.statuses.where(visibility: [:public, :unlisted], reblog_of_id: nil)
+      end
 
       if params[:media]
         account_media_status_ids = @account.media_attachments.attached.reorder(nil).select(:status_id).distinct
         @statuses.merge!(Status.where(id: account_media_status_ids))
       end
-
       @statuses = @statuses.preload(:media_attachments, :mentions).page(params[:page]).per(PER_PAGE)
       @form     = Form::StatusBatch.new
     end

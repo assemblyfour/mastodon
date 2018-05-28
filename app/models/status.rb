@@ -32,6 +32,7 @@ class Status < ApplicationRecord
   include StatusThreadingConcern
 
   update_index('statuses#status', :proper) if Chewy.enabled?
+  update_index('listings') { self } if Chewy.enabled?
 
   enum visibility: [:public, :unlisted, :private, :direct], _suffix: :visibility
 
@@ -59,6 +60,9 @@ class Status < ApplicationRecord
   validates :uri, uniqueness: true, presence: true, unless: :local?
   validates :text, presence: true, unless: -> { with_media? || reblog? }
   validates_with StatusLengthValidator
+  validates_with DisallowedHashtagsValidator
+  validates_with SwlistingsValidator
+  validates_with TempSuspensionValidator
   validates :reblog, uniqueness: { scope: :account }, if: :reblog?
 
   default_scope { recent }

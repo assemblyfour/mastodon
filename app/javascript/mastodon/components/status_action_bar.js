@@ -9,6 +9,7 @@ import { me } from '../initial_state';
 
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
+  direct: { id: 'status.direct', defaultMessage: 'Direct message @{name}' },
   mention: { id: 'status.mention', defaultMessage: 'Mention @{name}' },
   mute: { id: 'account.mute', defaultMessage: 'Mute @{name}' },
   block: { id: 'account.block', defaultMessage: 'Block @{name}' },
@@ -41,6 +42,7 @@ export default class StatusActionBar extends ImmutablePureComponent {
     onFavourite: PropTypes.func,
     onReblog: PropTypes.func,
     onDelete: PropTypes.func,
+    onDirect: PropTypes.func,
     onMention: PropTypes.func,
     onMute: PropTypes.func,
     onBlock: PropTypes.func,
@@ -90,6 +92,10 @@ export default class StatusActionBar extends ImmutablePureComponent {
     this.props.onMention(this.props.status.get('account'), this.context.router.history);
   }
 
+  handleDirectClick = () => {
+    this.props.onDirect(this.props.status.get('account'), this.context.router.history);
+  }
+
   handleMuteClick = () => {
     this.props.onMute(this.props.status.get('account'));
   }
@@ -123,6 +129,7 @@ export default class StatusActionBar extends ImmutablePureComponent {
 
     let menu = [];
     let reblogIcon = 'retweet';
+    let reblogCount = status.get('reblogs_count');
     let replyIcon;
     let replyTitle;
 
@@ -147,6 +154,7 @@ export default class StatusActionBar extends ImmutablePureComponent {
       menu.push({ text: intl.formatMessage(messages.delete), action: this.handleDeleteClick });
     } else {
       menu.push({ text: intl.formatMessage(messages.mention, { name: status.getIn(['account', 'username']) }), action: this.handleMentionClick });
+      menu.push({ text: intl.formatMessage(messages.direct, { name: status.getIn(['account', 'username']) }), action: this.handleDirectClick });
       menu.push(null);
       menu.push({ text: intl.formatMessage(messages.mute, { name: status.getIn(['account', 'username']) }), action: this.handleMuteClick });
       menu.push({ text: intl.formatMessage(messages.block, { name: status.getIn(['account', 'username']) }), action: this.handleBlockClick });
@@ -155,9 +163,12 @@ export default class StatusActionBar extends ImmutablePureComponent {
 
     if (status.get('visibility') === 'direct') {
       reblogIcon = 'envelope';
+      reblogCount = '';
     } else if (status.get('visibility') === 'private') {
       reblogIcon = 'lock';
+      reblogCount = '';
     }
+
 
     if (status.get('in_reply_to_id', null) === null) {
       replyIcon = 'reply';
@@ -174,8 +185,11 @@ export default class StatusActionBar extends ImmutablePureComponent {
     return (
       <div className='status__action-bar'>
         <IconButton className='status__action-bar-button' disabled={anonymousAccess} title={replyTitle} icon={replyIcon} onClick={this.handleReplyClick} />
+        <div className='status__action-bar-counter'></div>
         <IconButton className='status__action-bar-button' disabled={anonymousAccess || !publicStatus} active={status.get('reblogged')} pressed={status.get('reblogged')} title={!publicStatus ? intl.formatMessage(messages.cannot_reblog) : intl.formatMessage(messages.reblog)} icon={reblogIcon} onClick={this.handleReblogClick} />
+        <div className='status__action-bar-counter'>{reblogCount}</div>
         <IconButton className='status__action-bar-button star-icon' disabled={anonymousAccess} animate active={status.get('favourited')} pressed={status.get('favourited')} title={intl.formatMessage(messages.favourite)} icon='star' onClick={this.handleFavouriteClick} />
+        <div className='status__action-bar-counter'>{status.get('favourites_count')}</div>
         {shareButton}
 
         <div className='status__action-bar-dropdown'>

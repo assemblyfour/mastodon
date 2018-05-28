@@ -5,7 +5,7 @@ require 'sidekiq-bulk'
 class SoftBlockDomainFollowersWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: 'pull'
+  sidekiq_options queue: 'realtime'
 
   def perform(account_id, domain)
     followers_id = Account.find(account_id).followers.where(domain: domain).pluck(:id)

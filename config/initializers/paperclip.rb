@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+Paperclip::DataUriAdapter.register
 Paperclip.options[:read_timeout] = 60
 
 Paperclip.interpolates :filename do |attachment, style|
@@ -14,43 +14,33 @@ Paperclip::Attachment.default_options.merge!(
 )
 
 if ENV['S3_ENABLED'] == 'true'
-  require 'aws-sdk-s3'
+  require 'fog-aws'
 
   s3_region   = ENV.fetch('S3_REGION')   { 'us-east-1' }
   s3_protocol = ENV.fetch('S3_PROTOCOL') { 'https' }
-  s3_hostname = ENV.fetch('S3_HOSTNAME') { "s3-#{s3_region}.amazonaws.com" }
 
   Paperclip::Attachment.default_options.merge!(
-    storage: :s3,
-    s3_protocol: s3_protocol,
-    s3_host_name: s3_hostname,
-    s3_headers: {
-      'Cache-Control' => 'max-age=315576000',
+    fog_credentials: {
+      provider: 'AWS',
+      region: s3_region,
+      scheme: s3_protocol,
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
     },
-    s3_permissions: ENV.fetch('S3_PERMISSION') { 'public-read' },
-    s3_region: s3_region,
-    s3_credentials: {
-      bucket: ENV['S3_BUCKET'],
-      access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-      secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    },
-    s3_options: {
-      signature_version: ENV.fetch('S3_SIGNATURE_VERSION') { 'v4' },
-    }
+    fog_directory: ENV['S3_BUCKET'],
   )
 
   if ENV.has_key?('S3_ENDPOINT')
-    Paperclip::Attachment.default_options[:s3_options].merge!(
+    Paperclip::Attachment.default_options[:fog_credentials].merge!(
       endpoint: ENV['S3_ENDPOINT'],
-      force_path_style: true
     )
     Paperclip::Attachment.default_options[:url] = ':s3_path_url'
   end
 
   if ENV.has_key?('S3_CLOUDFRONT_HOST')
     Paperclip::Attachment.default_options.merge!(
-      url: ':s3_alias_url',
-      s3_host_alias: ENV['S3_CLOUDFRONT_HOST']
+      url: ':fog_public_url',
+      fog_host: ENV['S3_CLOUDFRONT_HOST']
     )
   end
 elsif ENV['SWIFT_ENABLED'] == 'true'

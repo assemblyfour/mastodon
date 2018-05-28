@@ -13,8 +13,8 @@ gem 'pg', '~> 0.20'
 gem 'pghero', '~> 1.7'
 gem 'dotenv-rails', '~> 2.2'
 
-gem 'aws-sdk-s3', '~> 1.8', require: false
 gem 'fog-core', '~> 1.45'
+gem 'fog-aws', require: false
 gem 'fog-local', '~> 0.4', require: false
 gem 'fog-openstack', '~> 0.1', require: false
 gem 'paperclip', '~> 6.0'
@@ -135,6 +135,7 @@ group :development do
 end
 
 group :production do
+  gem 'log16', git: 'https://github.com/chendo/log16.git'
   gem 'lograge', '~> 0.7'
   gem 'redis-rails', '~> 5.0'
 end

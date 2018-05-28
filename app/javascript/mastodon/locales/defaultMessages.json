@@ -176,6 +176,10 @@
         "id": "status.delete"
       },
       {
+        "defaultMessage": "Direct message @{name}",
+        "id": "status.direct"
+      },
+      {
         "defaultMessage": "Mention @{name}",
         "id": "status.mention"
       },
@@ -381,6 +385,10 @@
         "id": "account.mention"
       },
       {
+        "defaultMessage": "Direct message @{name}",
+        "id": "account.direct"
+      },
+      {
         "defaultMessage": "Edit profile",
         "id": "account.edit_profile"
       },
@@ -525,7 +533,7 @@
   {
     "descriptors": [
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "column.community"
       },
       {
@@ -804,6 +812,10 @@
       {
         "defaultMessage": "This toot won't be listed under any hashtag as it is unlisted. Only public toots can be searched by hashtag.",
         "id": "compose_form.hashtag_warning"
+      },
+      {
+        "defaultMessage": "This toot will only be visible to all the mentioned users.",
+        "id": "compose_form.direct_message_warning"
       }
     ],
     "path": "app/javascript/mastodon/features/compose/containers/warning_container.json"
@@ -827,7 +839,7 @@
         "id": "navigation_bar.public_timeline"
       },
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "navigation_bar.community_timeline"
       },
       {
@@ -899,7 +911,7 @@
         "id": "column_subheading.settings"
       },
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "navigation_bar.community_timeline"
       },
       {
@@ -1311,6 +1323,10 @@
         "id": "status.delete"
       },
       {
+        "defaultMessage": "Direct message @{name}",
+        "id": "status.direct"
+      },
+      {
         "defaultMessage": "Mention @{name}",
         "id": "status.mention"
       },
@@ -1520,7 +1536,7 @@
         "id": "column.notifications"
       },
       {
-        "defaultMessage": "Local timeline",
+        "defaultMessage": "Community timeline",
         "id": "column.community"
       },
       {
@@ -1656,6 +1672,10 @@
       {
         "defaultMessage": "Notifications",
         "id": "tabs_bar.notifications"
+      },
+      {
+        "defaultMessage": "Search",
+        "id": "tabs_bar.search"
       },
       {
         "defaultMessage": "Local",

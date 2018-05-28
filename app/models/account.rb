@@ -3,7 +3,6 @@
 #
 # Table name: accounts
 #
-#  id                      :integer          not null, primary key
 #  username                :string           default(""), not null
 #  domain                  :string
 #  secret                  :string           default(""), not null
@@ -41,9 +40,12 @@
 #  shared_inbox_url        :string           default(""), not null
 #  followers_url           :string           default(""), not null
 #  protocol                :integer          default("ostatus"), not null
+#  id                      :integer          not null, primary key
 #  memorial                :boolean          default(FALSE), not null
 #  moved_to_account_id     :integer
 #  featured_collection_url :string
+#  suspended_until         :datetime
+#  suspension_reason       :text
 #
 
 class Account < ApplicationRecord
@@ -95,6 +97,8 @@ class Account < ApplicationRecord
   has_many :reports
   has_many :targeted_reports, class_name: 'Report', foreign_key: :target_account_id
 
+  has_many :report_notes, dependent: :destroy
+
   # Moderation notes
   has_many :account_moderation_notes, dependent: :destroy
   has_many :targeted_moderation_notes, class_name: 'AccountModerationNote', foreign_key: :target_account_id, dependent: :destroy
@@ -114,6 +118,7 @@ class Account < ApplicationRecord
   scope :partitioned, -> { order('row_number() over (partition by domain)') }
   scope :silenced, -> { where(silenced: true) }
   scope :suspended, -> { where(suspended: true) }
+  scope :without_suspended, -> { where(suspended: false) }
   scope :recent, -> { reorder(id: :desc) }
   scope :alphabetic, -> { order(domain: :asc, username: :asc) }
   scope :by_domain_accounts, -> { group(:domain).select(:domain, 'COUNT(*) AS accounts_count').order('accounts_count desc') }
@@ -122,6 +127,7 @@ class Account < ApplicationRecord
   scope :matches_domain, ->(value) { where(arel_table[:domain].matches("%#{value}%")) }
 
   delegate :email,
+           :unconfirmed_email,
            :current_sign_in_ip,
            :current_sign_in_at,
            :confirmed?,

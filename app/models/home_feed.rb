@@ -8,7 +8,7 @@ class HomeFeed < Feed
   end
 
   def get(limit, max_id = nil, since_id = nil)
-    if redis.exists("account:#{@account.id}:regeneration")
+    if redis.exists("account:#{@account.id}:regeneration") || redis.exists("flag:db_home_feed")
       from_database(limit, max_id, since_id)
     else
       super

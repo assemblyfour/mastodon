@@ -7,7 +7,7 @@ class Api::V1::Accounts::CredentialsController < Api::BaseController
 
   def show
     @account = current_account
-    render json: @account, serializer: REST::CredentialAccountSerializer
+    render json: @account, serializer: REST::CredentialAccountSerializer, show_email: doorkeeper_token.includes_scope?('email')
   end
 
   def update

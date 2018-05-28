@@ -1,0 +1,37 @@
+.compact-header
+  %h1 Switter Listings
+
+%p
+  - cache 'listings_count', expires_in: 1.minute, race_condition_ttl: 5.seconds do
+    Search #{ListingSearchService.listings.count} active Switter listings posted in the last 30 days.
+= form_tag '/', method: 'GET', class: 'simple_form' do
+  .fields-group
+    .input.string.required
+      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms here. For example: Melbourne'
+
+    .actions
+      %button Search
+      = link_to 'Post a listing', '/new', class: 'button'
+
+- @listings.each do |listing|
+  - cache listing, expires_in: 2.weeks, race_condition_ttl: 1.minute do
+    .activity-stream.activity-stream-headless.h-entry
+      .entry
+        = render partial: "stream_entries/simple_status", locals: { status: listing, include_threads: false }
+  %br
+
+- if @listings.empty?
+  .flash-message= "Sorry, your search for '#{params[:query]}' has no results. Try a different search term."
+
+%br
+%br
+%br
+
+= form_tag '/', method: 'GET', class: 'simple_form' do
+  .fields-group
+    .input.string.required
+      = text_field_tag 'query', params[:query], class: 'string required', placeholder: 'Enter search terms here. For example: Melbourne'
+
+    .actions
+      %button Search
+      = link_to 'Post a listing', '/new', class: 'button'

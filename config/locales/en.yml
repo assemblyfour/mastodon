@@ -60,7 +60,15 @@ en:
       destroyed_msg: Moderation note successfully destroyed!
     accounts:
       are_you_sure: Are you sure?
+      avatar: Avatar
       by_domain: Domain
+      change_email:
+        changed_msg: Account email successfully changed!
+        current_email: Current Email
+        label: Change Email
+        new_email: New Email
+        submit: Change Email
+        title: Change Email for %{username}
       confirm: Confirm
       confirmed: Confirmed
       demote: Demote
@@ -108,6 +116,7 @@ en:
       public: Public
       push_subscription_expires: PuSH subscription expires
       redownload: Refresh avatar
+      remove_avatar: Remove avatar
       reset: Reset
       reset_password: Reset password
       resubscribe: Resubscribe
@@ -128,6 +137,7 @@ en:
       statuses: Statuses
       subscribe: Subscribe
       title: Accounts
+      unconfirmed_email: Unconfirmed E-mail
       undo_silenced: Undo silence
       undo_suspension: Undo suspension
       unsubscribe: Unsubscribe
@@ -135,6 +145,8 @@ en:
       web: Web
     action_logs:
       actions:
+        assigned_to_self_report: "%{name} assigned report %{target} to themselves"
+        change_email_user: "%{name} changed the e-mail address of user %{target}"
         confirm_user: "%{name} confirmed e-mail address of user %{target}"
         create_custom_emoji: "%{name} uploaded new emoji %{target}"
         create_domain_block: "%{name} blocked domain %{target}"
@@ -150,10 +162,14 @@ en:
         enable_user: "%{name} enabled login for user %{target}"
         memorialize_account: "%{name} turned %{target}'s account into a memoriam page"
         promote_user: "%{name} promoted user %{target}"
+        remove_avatar_user: "%{name} removed %{target}'s avatar"
+        reopen_report: "%{name} reopened report %{target}"
         reset_password_user: "%{name} reset password of user %{target}"
-        resolve_report: "%{name} dismissed report %{target}"
+        resolve_report: "%{name} resolved report %{target}"
         silence_account: "%{name} silenced %{target}'s account"
         suspend_account: "%{name} suspended %{target}'s account"
+        temp_suspend_account: "%{name} temporarily suspended %{target}'s account"
+        unassigned_report: "%{name} unassigned report %{target}"
         unsilence_account: "%{name} unsilenced %{target}'s account"
         unsuspend_account: "%{name} unsuspended %{target}'s account"
         update_custom_emoji: "%{name} updated emoji %{target}"
@@ -239,15 +255,31 @@ en:
         expired: Expired
         title: Filter
       title: Invites
+    report_notes:
+      created_msg: Report note successfully created!
+      destroyed_msg: Report note successfully deleted!
     reports:
       action_taken_by: Action taken by
       are_you_sure: Are you sure?
+      assign_to_self: Assign to me
+      assigned: Assigned Moderator
       comment:
-        label: Comment
+        label: Report Comment
         none: None
+      created_at: Reported
       delete: Delete
+      history: Moderation History
       id: ID
       mark_as_resolved: Mark as resolved
+      mark_as_unresolved: Mark as unresolved
+      notes:
+        create: Add Note
+        create_and_resolve: Resolve with Note
+        create_and_unresolve: Reopen with Note
+        delete: Delete
+        label: Moderator Notes
+        new_label: Add Moderator Note
+        placeholder: Describe what actions have been taken, or any other updates to this report…
       nsfw:
         'false': Unhide media attachments
         'true': Hide media attachments
@@ -256,12 +288,16 @@ en:
       reported_account: Reported account
       reported_by: Reported by
       resolved: Resolved
+      resolved_msg: Report successfully resolved!
       silence_account: Silence account
       status: Status
+      statuses: Reported Toots
       suspend_account: Suspend account
       target: Target
       title: Reports
+      unassign: Unassign
       unresolved: Unresolved
+      updated_at: Updated
       view: View
     settings:
       activity_api_enabled:
@@ -644,7 +680,13 @@ en:
       video:
         one: "%{count} video"
         other: "%{count} videos"
+    disallowed_hashtags:
+      one: "contained a disallowed hashtag: %{tags}"
+      other: "contained the disallowed hashtags: %{tags}"
     content_warning: 'Content warning: %{warning}'
+    disallowed_hashtags:
+      one: 'contained a disallowed hashtag: %{tags}'
+      other: 'contained the disallowed hashtags: %{tags}'
     open_in_web: Open in web
     over_character_limit: character limit of %{max} exceeded
     pin_errors:

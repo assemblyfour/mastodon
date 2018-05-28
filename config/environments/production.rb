@@ -35,7 +35,7 @@ Rails.application.configure do
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
-  config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
+  # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Allow to specify public IP of reverse proxy if it's needed
   config.action_dispatch.trusted_proxies = ENV['TRUSTED_PROXY_IP'].split.map { |item| IPAddr.new(item) } unless ENV['TRUSTED_PROXY_IP'].blank?
@@ -66,6 +66,17 @@ Rails.application.configure do
 
   # Better log formatting
   config.lograge.enabled = true
+  config.lograge.logger = Log16.new(Logger.new(STDOUT), options: {severity: Logger::INFO, timestamp_key: :@timestamp, message_key: :message})
+  config.lograge.log_level = :log
+  IGNORED_FIELDS = %w(headers params)
+  config.lograge.custom_options = lambda do |event|
+    level = event.payload.fetch(:status, 500) >= 400 ? 'error' : 'debug'
+    payload = event.payload
+    msg = "#{payload.fetch(:method)} #{payload.fetch(:path)}"
+    {log_level: level, timestamp: event.time.iso8601(3), msg: msg}.merge(event.payload).reject { |k, v| IGNORED_FIELDS.include?(k.to_s) }
+  end
+  config.lograge.formatter = Lograge::Formatters::Raw.new
+  config.lograge.ignore_actions = ['HealthController#check']
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false

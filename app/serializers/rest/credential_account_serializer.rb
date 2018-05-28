@@ -2,6 +2,11 @@
 
 class REST::CredentialAccountSerializer < REST::AccountSerializer
   attributes :source
+  attribute :email, if: -> { instance_options[:show_email] }
+
+  def email
+    object.user.email
+  end
 
   def source
     user = object.user
