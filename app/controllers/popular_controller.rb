@@ -10,6 +10,7 @@ class PopularController < ApplicationController
       Status.local
             .includes(:account, :preview_cards, :mentions, :conversation)
             .with_public_visibility
+            .without_replies
             .where('reblogs_count + favourites_count > ?', threshold)
             .where('created_at BETWEEN ? AND ?', page.days.ago, (page - 1).days.ago)
             .reorder('reblogs_count + favourites_count DESC')
