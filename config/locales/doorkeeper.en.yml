@@ -114,7 +114,7 @@ en:
       application:
         title: OAuth authorization required
     scopes:
+      email: access your email address
       follow: follow, block, unblock and unfollow accounts
       read: read your account's data
       write: post on your behalf
-      email: access your email address
