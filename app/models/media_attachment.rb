@@ -30,7 +30,7 @@ class MediaAttachment < ApplicationRecord
   VIDEO_FILE_EXTENSIONS = ['.webm', '.mp4', '.m4v'].freeze
 
   IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'].freeze
-  VIDEO_MIME_TYPES = ['video/webm', 'video/mp4'].freeze
+  VIDEO_MIME_TYPES = ['video/webm', 'video/mp4', 'video/quicktime', 'video/mov', 'video/x-ms-wmv'].freeze
 
   IMAGE_STYLES = {
     original: {
@@ -66,7 +66,7 @@ class MediaAttachment < ApplicationRecord
                     processors: ->(f) { file_processors f },
                     convert_options: { all: '-quality 90 -strip' }
 
-  validates_attachment_content_type :file, content_type: IMAGE_MIME_TYPES + VIDEO_MIME_TYPES
+  validates_attachment_content_type :file, content_type: IMAGE_MIME_TYPES + VIDEO_MIME_TYPES, message: "Sorry! We do not accept the attached file type"
   validates_attachment_size :file, less_than: LIMIT
   remotable_attachment :file, LIMIT
 
