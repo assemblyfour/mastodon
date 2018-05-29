@@ -3,6 +3,7 @@
 #
 # Table name: accounts
 #
+#  id                      :bigint(8)        not null, primary key
 #  username                :string           default(""), not null
 #  domain                  :string
 #  secret                  :string           default(""), not null
@@ -42,10 +43,12 @@
 #  protocol                :integer          default("ostatus"), not null
 #  id                      :integer          not null, primary key
 #  memorial                :boolean          default(FALSE), not null
-#  moved_to_account_id     :integer
+#  moved_to_account_id     :bigint(8)
 #  featured_collection_url :string
 #  suspended_until         :datetime
 #  suspension_reason       :text
+#  fields                  :jsonb
+#  actor_type              :string
 #
 
 class Account < ApplicationRecord
@@ -75,6 +78,7 @@ class Account < ApplicationRecord
   validates_with UnreservedUsernameValidator, if: -> { local? && will_save_change_to_username? }
   validates :display_name, length: { maximum: 30 }, if: -> { local? && will_save_change_to_display_name? }
   validates :note, length: { maximum: 160 }, if: -> { local? && will_save_change_to_note? }
+  validates :fields, length: { maximum: 4 }, if: -> { local? && will_save_change_to_fields? }
 
   # Timelines
   has_many :stream_entries, inverse_of: :account, dependent: :destroy
@@ -115,7 +119,7 @@ class Account < ApplicationRecord
   scope :without_followers, -> { where(followers_count: 0) }
   scope :with_followers, -> { where('followers_count > 0') }
   scope :expiring, ->(time) { remote.where.not(subscription_expires_at: nil).where('subscription_expires_at < ?', time) }
-  scope :partitioned, -> { order('row_number() over (partition by domain)') }
+  scope :partitioned, -> { order(Arel.sql('row_number() over (partition by domain)')) }
   scope :silenced, -> { where(silenced: true) }
   scope :suspended, -> { where(suspended: true) }
   scope :without_suspended, -> { where(suspended: false) }
@@ -135,6 +139,7 @@ class Account < ApplicationRecord
            :moderator?,
            :staff?,
            :locale,
+           :hides_network?,
            to: :user,
            prefix: true,
            allow_nil: true
@@ -147,6 +152,16 @@ class Account < ApplicationRecord
 
   def moved?
     moved_to_account_id.present?
+  end
+
+  def bot?
+    %w(Application Service).include? actor_type
+  end
+
+  alias bot bot?
+
+  def bot=(val)
+    self.actor_type = ActiveModel::Type::Boolean.new.cast(val) ? 'Service' : 'Person'
   end
 
   def acct
@@ -190,6 +205,32 @@ class Account < ApplicationRecord
 
   def keypair
     @keypair ||= OpenSSL::PKey::RSA.new(private_key || public_key)
+  end
+
+  def fields
+    (self[:fields] || []).map { |f| Field.new(self, f) }
+  end
+
+  def fields_attributes=(attributes)
+    fields = []
+
+    if attributes.is_a?(Hash)
+      attributes.each_value do |attr|
+        next if attr[:name].blank?
+        fields << attr
+      end
+    end
+
+    self[:fields] = fields
+  end
+
+  def build_fields
+    return if fields.size >= 4
+
+    raw_fields = self[:fields] || []
+    add_fields = 4 - raw_fields.size
+    add_fields.times { raw_fields << { name: '', value: '' } }
+    self.fields = raw_fields
   end
 
   def magic_key
@@ -241,17 +282,32 @@ class Account < ApplicationRecord
     shared_inbox_url.presence || inbox_url
   end
 
+  class Field < ActiveModelSerializers::Model
+    attributes :name, :value, :account, :errors
+
+    def initialize(account, attr)
+      @account = account
+      @name    = attr['name'].strip[0, 255]
+      @value   = attr['value'].strip[0, 255]
+      @errors  = {}
+    end
+
+    def to_h
+      { name: @name, value: @value }
+    end
+  end
+
   class << self
     def readonly_attributes
       super - %w(statuses_count following_count followers_count)
     end
 
     def domains
-      reorder(nil).pluck('distinct accounts.domain')
+      reorder(nil).pluck(Arel.sql('distinct accounts.domain'))
     end
 
     def inboxes
-      urls = reorder(nil).where(protocol: :activitypub).pluck("distinct coalesce(nullif(accounts.shared_inbox_url, ''), accounts.inbox_url)")
+      urls = reorder(nil).where(protocol: :activitypub).pluck(Arel.sql("distinct coalesce(nullif(accounts.shared_inbox_url, ''), accounts.inbox_url)"))
       DeliveryFailureTracker.filter(urls)
     end
 
@@ -356,6 +412,10 @@ class Account < ApplicationRecord
     end
   end
 
+  def emojis
+    @emojis ||= CustomEmoji.from_text(emojifiable_text, domain)
+  end
+
   before_create :generate_keys
   before_validation :normalize_domain
   before_validation :prepare_contents, if: :local?
@@ -368,9 +428,9 @@ class Account < ApplicationRecord
   end
 
   def generate_keys
-    return unless local?
+    return unless local? && !Rails.env.test?
 
-    keypair = OpenSSL::PKey::RSA.new(Rails.env.test? ? 512 : 2048)
+    keypair = OpenSSL::PKey::RSA.new(2048)
     self.private_key = keypair.to_pem
     self.public_key  = keypair.public_key.to_pem
   end
@@ -379,5 +439,9 @@ class Account < ApplicationRecord
     return if local?
 
     self.domain = TagManager.instance.normalize_domain(domain)
+  end
+
+  def emojifiable_text
+    [note, display_name, fields.map(&:value)].join(' ')
   end
 end
