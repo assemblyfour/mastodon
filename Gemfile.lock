@@ -145,6 +145,7 @@ GEM
       rpam2 (~> 3.0)
     diff-lcs (1.3)
     docile (1.1.5)
+    dogstatsd-ruby (3.3.0)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (4.2.6)
@@ -523,6 +524,9 @@ GEM
     sidekiq-bulk (0.1.1)
       activesupport
       sidekiq
+    sidekiq-datadog (0.3.5)
+      dogstatsd-ruby (>= 2.0.0)
+      sidekiq
     sidekiq-scheduler (2.1.10)
       redis (>= 3, < 5)
       rufus-scheduler (~> 3.2)
@@ -714,6 +718,7 @@ DEPENDENCIES
   scss_lint (~> 0.55)
   sidekiq (~> 5.0)
   sidekiq-bulk (~> 0.1.1)
+  sidekiq-datadog
   sidekiq-scheduler (~> 2.1)
   sidekiq-unique-jobs (~> 5.0)
   simple-navigation (~> 4.0)
