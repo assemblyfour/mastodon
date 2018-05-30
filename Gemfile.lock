@@ -5,6 +5,14 @@ GIT
     log16 (1.0.0)
       json
 
+GIT
+  remote: https://github.com/chendo/sidekiq-datadog.git
+  revision: 3e9d2bab795c817d9bf75a2de61b14bb24bcf20c
+  specs:
+    sidekiq-datadog (0.3.5)
+      dogstatsd-ruby (>= 2.0.0)
+      sidekiq
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -524,9 +532,6 @@ GEM
     sidekiq-bulk (0.1.1)
       activesupport
       sidekiq
-    sidekiq-datadog (0.3.5)
-      dogstatsd-ruby (>= 2.0.0)
-      sidekiq
     sidekiq-scheduler (2.1.10)
       redis (>= 3, < 5)
       rufus-scheduler (~> 3.2)
@@ -718,7 +723,7 @@ DEPENDENCIES
   scss_lint (~> 0.55)
   sidekiq (~> 5.0)
   sidekiq-bulk (~> 0.1.1)
-  sidekiq-datadog
+  sidekiq-datadog!
   sidekiq-scheduler (~> 2.1)
   sidekiq-unique-jobs (~> 5.0)
   simple-navigation (~> 4.0)

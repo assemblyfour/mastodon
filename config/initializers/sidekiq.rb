@@ -12,7 +12,7 @@ Sidekiq.configure_server do |config|
 
   config.server_middleware do |chain|
     chain.add SidekiqErrorHandler
-    chain.add(Sidekiq::Middleware::Server::Datadog, tags: ["app:switter"])
+    chain.add(Sidekiq::Middleware::Server::Datadog, tags: ["app:switter"], no_host_tag: true)
   end
 end
 
