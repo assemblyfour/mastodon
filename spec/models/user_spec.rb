@@ -74,8 +74,8 @@ RSpec.describe User, type: :model do
 
     describe 'inactive' do
       it 'returns a relation of inactive users' do
-        specified = Fabricate(:user, current_sign_in_at: 15.days.ago)
-        Fabricate(:user, current_sign_in_at: 13.days.ago)
+        specified = Fabricate(:user, current_sign_in_at: (User::ACTIVE_DURATION + 1.day).ago)
+        Fabricate(:user, current_sign_in_at: (User::ACTIVE_DURATION - 1.day).ago)
 
         expect(User.inactive).to match_array([specified])
       end

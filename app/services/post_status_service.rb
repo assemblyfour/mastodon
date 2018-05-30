@@ -33,7 +33,7 @@ class PostStatusService < BaseService
       visibility = :unlisted if tags.any? { |tag| LISTING_HASHTAGS.include? tag.downcase }
     end
 
-    if media && media.any? { |m| m.file_meta.fetch('nudity_level', 0) >= MediaAnalysisService::NUDITY_THRESHOLD } && account.targeted_reports.count >= 2
+    if media && media.any? { |m| m.file_meta && m.file_meta.fetch('nudity_level', 0) >= MediaAnalysisService::NUDITY_THRESHOLD } && account.targeted_reports.count >= 2
       sensitive = true
     end
 
