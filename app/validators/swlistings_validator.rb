@@ -4,7 +4,7 @@ class SwlistingsValidator < ActiveModel::Validator
   def validate(status)
     return unless status.local? && !status.reblog?
     return if status.reply? || status.private_visibility? || status.direct_visibility?
-    return if status.account.user.staff?
+    return if status.account.user&.staff?
 
     tags = Extractor.extract_hashtags(status.text)
 
