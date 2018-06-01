@@ -36,6 +36,7 @@ class PopularController < ApplicationController
   REBLOG_WEIGHTING = 1
   FAVOURITE_WEIGHTING = 0.7
   CONVERSATION_WEIGHTING = 3
+  IGNORE_POSTS_REGEXP = ENV['POPULAR_POSTS_IGNORE_REGEXP'] ? Regexp.new(ENV['POPULAR_POSTS_IGNORE_REGEXP'], true) : nil
   def fetch_popular(period:)
     raise ArgumentError unless [:day, :week, :month].include?(period)
     expires = 1.send(period) * 0.005
@@ -57,7 +58,7 @@ class PopularController < ApplicationController
                 s.favourites_count * FAVOURITE_WEIGHTING +
                 s.conversation.statuses.pluck(:account_id).uniq.count * CONVERSATION_WEIGHTING
               }
-              .reject { |s| s.text =~ /(\d\d\d.{0,2}\d\d\d.?\d\d\d\d)/ }[0...3]
+              .reject { |s| IGNORE_POSTS_REGEXP && s.text =~ IGNORE_POSTS_REGEXP }[0...3]
             }
             .flatten
             .sort_by { |s|
