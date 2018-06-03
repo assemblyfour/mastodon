@@ -69,7 +69,6 @@ gem 'rack-timeout', '~> 0.4'
 gem 'rails-i18n', '~> 5.1'
 gem 'rails-settings-cached', '~> 0.6'
 gem 'redis', '~> 4.0', require: ['redis', 'redis/connection/hiredis']
-gem 'rufus-scheduler', '~> 3.4'
 gem 'mario-redis-lock', '~> 1.2', require: 'redis_lock'
 gem 'rqrcode', '~> 0.10'
 gem 'ruby-oembed', '~> 0.12', require: 'oembed'
