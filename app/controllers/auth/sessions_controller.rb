@@ -39,7 +39,11 @@ class Auth::SessionsController < Devise::SessionsController
       if use_seamless_external_login? && Devise.check_at_sign && user_params[:email].index('@').nil?
         User.joins(:account).find_by(accounts: { username: user_params[:email] })
       else
-        User.find_for_authentication(email: user_params[:email])
+        if user_params[:email].index('@').nil?
+          User.joins(:account).find_by(accounts: { username: user_params[:email] })
+        else
+          User.find_for_authentication(email: user_params[:email])
+        end
       end
     end
   end
