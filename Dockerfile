@@ -83,6 +83,7 @@ COPY Rakefile /mastodon/
 COPY app/lib /mastodon/app/lib/
 COPY lib /mastodon/lib/
 COPY app/controllers/application_controller.rb /mastodon/app/controllers/
+COPY app/controllers/concerns /mastodon/app/controllers/concerns/
 COPY app/validators /mastodon/app/validators/
 COPY app/models/user.rb app/models/setting.rb app/models/application_record.rb /mastodon/app/models/
 COPY app/models/concerns /mastodon/app/models/concerns/
