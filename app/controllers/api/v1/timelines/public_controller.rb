@@ -25,7 +25,7 @@ class Api::V1::Timelines::PublicController < Api::BaseController
       limit_param(DEFAULT_STATUSES_LIMIT),
       params[:max_id],
       params[:since_id]
-    )
+    ).reject(&:listing?)
 
     if truthy_param?(:only_media)
       # `SELECT DISTINCT id, updated_at` is too slow, so pluck ids at first, and then select id, updated_at with ids.

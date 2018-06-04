@@ -79,6 +79,7 @@ class FanOutOnWriteService < BaseService
   end
 
   def deliver_to_public(status)
+    return if status.listing?
     Rails.logger.debug "Delivering status #{status.id} to public timeline"
 
     Redis.current.publish('timeline:public', @payload)

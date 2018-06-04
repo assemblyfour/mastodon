@@ -14,7 +14,6 @@ class PostStatusService < BaseService
   # @option [String] :idempotency Optional idempotency key
   # @return [Status]
 
-  LISTING_HASHTAGS = %w{swlisting swlistings}
   def call(account, text, in_reply_to = nil, **options)
     if options[:idempotency].present?
       existing_id = redis.get("idempotency:status:#{account.id}:#{options[:idempotency]}")
@@ -27,11 +26,6 @@ class PostStatusService < BaseService
     text       = '.' if text.blank? && !media.empty?
     visibility = options[:visibility] || account.user&.setting_default_privacy
     sensitive  = options[:sensitive].nil? ? account.user&.setting_default_sensitive : options[:sensitive]
-
-    if account.local?
-      tags = Extractor.extract_hashtags(text)
-      visibility = :unlisted if tags.any? { |tag| LISTING_HASHTAGS.include? tag.downcase }
-    end
 
     if media && media.any? { |m| m.file_meta && m.file_meta.fetch('nudity_level', 0) >= MediaAnalysisService::NUDITY_THRESHOLD } && account.targeted_reports.count >= 2
       sensitive = true

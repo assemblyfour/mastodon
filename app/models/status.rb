@@ -166,6 +166,11 @@ class Status < ApplicationRecord
     CustomEmoji.from_text([spoiler_text, text].join(' '), account.domain)
   end
 
+  LISTING_HASHTAGS = %w{swlisting swlistings}
+  def listing?
+    (tags.pluck(:name) & LISTING_HASHTAGS).any?
+  end
+
   after_create_commit :store_uri, if: :local?
   after_create_commit :update_statistics, if: :local?
 
