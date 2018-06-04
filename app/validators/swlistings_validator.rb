@@ -20,7 +20,7 @@ class SwlistingsValidator < ActiveModel::Validator
                                 .without_reblogs
                                 .where(Status.arel_table[:created_at].gt(1.day.ago))
 
-    unless swlisting_statuses.count < 3
+    unless swlisting_statuses.count { |s| s.text =~ /#swlisting/ } < 3
       status.errors.add(:base, 'You can only post 3 times per day to #swlisting')
     end
   end

@@ -15,10 +15,18 @@ class AutoTaggingService < BaseService
     tags = JSON.parse(response.body).fetch('tags')
     existing_tags = status.tags.pluck(:name)
 
+    changed = false
     tags.map { |str| str.mb_chars.downcase }.uniq(&:to_s).each do |tag|
-      status.tags << Tag.where(name: tag).first_or_initialize(name: tag) unless existing_tags.include?(tag)
+      next if existing_tags.include?(tag)
+      status.tags << Tag.where(name: tag).first_or_initialize(name: tag)
+      changed = true
     end
 
     status.update(sensitive: true) if tags.include?('nsfw')
+
+    if changed
+      status.text_will_change!
+      status.save! # trigger update callbacks
+    end
   end
 end

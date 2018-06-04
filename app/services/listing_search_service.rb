@@ -21,13 +21,6 @@ class ListingSearchService < BaseService
     default_results.tap do |results|
       if query.blank?
         results[:listings] = all_listings
-                              .group_by { |s| s.account }
-                              .map { |account, statuses|
-                                statuses.sort_by(&:created_at).last
-                              }
-                              .flatten
-                              .sort_by(&:created_at).reverse[0...RESULTS]
-
       else
         results[:listings] = perform_listing_search!
       end
@@ -37,21 +30,29 @@ class ListingSearchService < BaseService
   private
 
   def all_listings
-    self.class.listings.limit(RESULTS)
+    filter_results(self.class.listings.limit(RESULTS))
   end
 
   def perform_listing_search!
-     ListingsIndex.query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed location location.stemmed) })
+     results = ListingsIndex.query(multi_match: { type: 'most_fields', query: query, operator: 'and', fields: %w(text text.stemmed location location.stemmed) })
                             .limit(RESULTS * 2)
                             .order(created_at: {order: :desc})
                             .objects
-                            .compact
-                            .group_by { |s| s.account }
-                            .map { |account, statuses|
-                              statuses.sort_by(&:created_at).last
-                            }
-                            .flatten
-                            .sort_by(&:created_at).reverse[0...RESULTS]
+    filter_results(results)
+  end
+
+  def filter_results(results)
+    results.compact
+           .group_by { |s| s.account }
+           .map { |account, statuses|
+             if statuses.any?(&:explicit_listing?)
+               statuses.select(&:explicit_listing?).sort_by(&:created_at).last
+             else
+               statuses.sort_by(&:created_at).last
+             end
+           }
+           .flatten
+           .sort_by(&:created_at).reverse[0...RESULTS]
   end
 
   def default_results

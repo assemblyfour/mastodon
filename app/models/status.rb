@@ -171,6 +171,10 @@ class Status < ApplicationRecord
     (tags.pluck(:name) & LISTING_HASHTAGS).any?
   end
 
+  def explicit_listing?
+    text =~ /#swlisting/
+  end
+
   after_create_commit :store_uri, if: :local?
   after_create_commit :update_statistics, if: :local?
 

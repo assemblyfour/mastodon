@@ -324,6 +324,8 @@ Rails.application.routes.draw do
   get '/about/more', to: 'about#more'
   get '/terms',      to: 'about#terms'
 
+  get '/listings', to: 'listings#index'
+  
   constraints subdomain: 'listings' do
     get '/', to: 'listings#index'
     get '/new', to: 'listings#new'
