@@ -1,0 +1,24 @@
+# frozen_string_literal: true
+
+class AutoTaggingService < BaseService
+  AUTO_TAGGER_URL = ENV.fetch('AUTO_TAGGER_URL', nil)
+
+  def call(status)
+    return unless AUTO_TAGGER_URL
+    return unless status.public_visibility?
+    response = Excon.post(AUTO_TAGGER_URL,
+                headers: {
+                  "Content-Type" => "application/json",
+                },
+                body: JSON.dump({text: status.text})
+              )
+    tags = JSON.parse(response.body).fetch('tags')
+    existing_tags = status.tags.pluck(:name)
+
+    tags.map { |str| str.mb_chars.downcase }.uniq(&:to_s).each do |tag|
+      status.tags << Tag.where(name: tag).first_or_initialize(name: tag) unless existing_tags.include?(tag)
+    end
+
+    status.update(sensitive: true) if tags.include?('nsfw')
+  end
+end
