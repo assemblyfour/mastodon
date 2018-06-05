@@ -33,9 +33,6 @@ class Scheduler::StatsScheduler
       b.gauge('statuses.replies', Status.local.where(reply: true).count)
       b.gauge('statuses.toots', Status.local.without_replies.without_reblogs.count)
       b.gauge('statuses.total', Status.local.count)
-      b.gauge('users.active.day', User.where('current_sign_in_at > ?', 1.day.ago).count)
-      b.gauge('users.active.week', User.where('current_sign_in_at > ?', 1.week.ago).count)
-      b.gauge('users.active.month', User.where('current_sign_in_at > ?', 1.month.ago).count)
       b.gauge('users.count', User.confirmed.count, tags: ["state:confirmed"])
       b.gauge('users.count', User.where(confirmed_at: nil).count, tags: ["state:unconfirmed"])
 
@@ -47,9 +44,16 @@ class Scheduler::StatsScheduler
         b.gauge("users.tooted.#{k}", v)
       end
 
+      {
+        day: 1.day.ago,
+        week: 1.week.ago,
+        month: 1.month.ago
+      }.each do |period, time|
+        b.gauge("users.active.#{period}", User.where('current_sign_in_at > ?', time).count)
+        b.gauge("listings.#{period}", ListingSearchService.listings.where('statuses.created_at > ?', time).count)
+        b.gauge("listings.accounts.#{period}", ListingSearchService.listings.reorder(nil).where('statuses.created_at > ?', time).distinct.count(:account_id))
+      end
     end
   end
-
-  private
 
 end
