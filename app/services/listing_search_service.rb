@@ -21,8 +21,10 @@ class ListingSearchService < BaseService
     default_results.tap do |results|
       if query.blank?
         results[:listings] = all_listings
+        Stats.increment('listing.browse')
       else
         results[:listings] = perform_listing_search!
+        Stats.increment('listing.search')
       end
     end
   end
