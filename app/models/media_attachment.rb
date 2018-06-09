@@ -54,6 +54,20 @@ class MediaAttachment < ApplicationRecord
       format: 'png',
       time: 0,
     },
+    original: {
+      format: 'mp4',
+      convert_options: {
+        output: {
+          'movflags' => 'faststart',
+          'pix_fmt'  => 'yuv420p',
+          'vsync'    => 'cfr',
+          'b:v'      => '1300K',
+          'maxrate'  => '1000K',
+          'bufsize'  => '1300K',
+          'crf'      => 18,
+          'vf'       => 'scale=\'min(800\, iw):min(800\, ih)\':force_original_aspect_ratio=decrease',
+        },
+      },
   }.freeze
 
   LIMIT = 8.megabytes
