@@ -68,6 +68,7 @@ class MediaAttachment < ApplicationRecord
           'vf'       => 'scale=\'min(800\, iw):min(800\, ih)\':force_original_aspect_ratio=decrease',
         },
       },
+    },
   }.freeze
 
   LIMIT = 8.megabytes
