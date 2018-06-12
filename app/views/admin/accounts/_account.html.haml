@@ -9,7 +9,7 @@
   %td
     - if account.suspended?
       Suspended
-    - elsif account.user.confirmed?
+    - elsif account.user&.confirmed?
       Confirmed
   %td= time_ago_in_words account.created_at
   %td
