@@ -8,7 +8,7 @@ class AccountFilter
   end
 
   def results
-    scope = Account.recent
+    scope = Account.alphabetic
 
     params.each do |key, value|
       scope.merge!(scope_for(key, value)) if value.present?

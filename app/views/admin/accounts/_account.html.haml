@@ -5,12 +5,13 @@
     - unless account.local?
       = link_to account.domain, admin_accounts_path(by_domain: account.domain)
   %td.email
-    = account.user.email
+    = account.user&.email
   %td
     - if account.suspended?
       Suspended
     - elsif account.user.confirmed?
       Confirmed
+  %td= time_ago_in_words account.created_at
   %td
     - if account.local?
       - if account.user.nil?
@@ -22,4 +23,3 @@
   %td
     = table_link_to 'circle', t('admin.accounts.web'), web_path("accounts/#{account.id}")
     = table_link_to 'globe', t('admin.accounts.public'), TagManager.instance.url_for(account)
-    = table_link_to 'pencil', t('admin.accounts.edit'), admin_account_path(account.id)
