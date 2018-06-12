@@ -1,9 +1,16 @@
 %tr
   %td.username
-    = account.username
+    = link_to account.username, admin_account_path(account.id)
   %td.domain
     - unless account.local?
       = link_to account.domain, admin_accounts_path(by_domain: account.domain)
+  %td.email
+    = account.user.email
+  %td
+    - if account.suspended?
+      Suspended
+    - elsif account.user.confirmed?
+      Confirmed
   %td
     - if account.local?
       - if account.user.nil?

@@ -53,8 +53,19 @@
               = t('admin.accounts.enabled')
               = table_link_to 'lock', t('admin.accounts.disable'), disable_admin_account_path(@account.id), method: :post if can?(:disable, @account.user)
         %tr
+          %th= t('admin.accounts.created')
+          %td
+            %time.formatted{ datetime: @account.created_at.iso8601, title: l(@account.created_at) }
+              = l @account.created_at
+            = "(#{time_ago_in_words @account.created_at})"
+        %tr
           %th= t('admin.accounts.most_recent_ip')
-          %td= @account.user_current_sign_in_ip
+          %td
+            = @account.user_current_sign_in_ip
+            –
+            - total_accounts = User.confirmed.where.not(id: @account.user.id).with_recent_ip_address(@account.user_current_sign_in_ip).count
+            - suspended_accounts = User.confirmed.joins(:account).where.not(id: @account.user.id).with_recent_ip_address(@account.user_current_sign_in_ip).where('accounts.suspended = true').count
+            = link_to "#{total_accounts} accounts, #{suspended_accounts} suspended", admin_accounts_path(ip: @account.user_current_sign_in_ip)
         %tr
           %th= t('admin.accounts.most_recent_activity')
           %td
