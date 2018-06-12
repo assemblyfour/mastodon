@@ -16,6 +16,7 @@ class Auth::RegistrationsController < Devise::RegistrationsController
   protected
 
   def check_ip_address
+    Stats.increment('users.new.attempt')
     Stats.increment('users.new.duplicate_ip') if User.confirmed.where('created_at > ?', 1.day.ago).with_recent_ip_address(request.ip).any?
     Stats.increment('users.new.suspended_ip') if User.confirmed.joins(:account).with_recent_ip_address(request.ip).where('accounts.suspended = true').any?
   end
