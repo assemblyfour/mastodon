@@ -4,6 +4,7 @@ class Auth::RegistrationsController < Devise::RegistrationsController
   layout :determine_layout
 
   before_action :check_enabled_registrations, only: [:new, :create]
+  before_action :check_ip_address, only: [:create]
   before_action :configure_sign_up_params, only: [:create]
   before_action :set_sessions, only: [:edit, :update]
   before_action :set_instance_presenter, only: [:new, :create, :update]
@@ -13,6 +14,11 @@ class Auth::RegistrationsController < Devise::RegistrationsController
   end
 
   protected
+
+  def check_ip_address
+    recently_created_from_ip = User.confirmed.where('created_at > ?', 1.day.ago).with_recent_ip_address(request.ip).count
+    Stats.increment('users.duplicate_ip') if recently_created_from_ip > 0
+  end
 
   def update_resource(resource, params)
     params[:password] = nil if Devise.pam_authentication && resource.encrypted_password.blank?
