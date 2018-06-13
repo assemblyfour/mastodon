@@ -17,7 +17,7 @@ class Auth::RegistrationsController < Devise::RegistrationsController
 
   def check_ip_address
     Stats.increment('users.new.attempt')
-    if User.where('created_at > ?', 1.day.ago).with_recent_ip_address(request.ip) >= 3
+    if User.where('created_at > ?', 1.day.ago).with_recent_ip_address(request.ip).count >= 3
       Stats.increment('users.new.duplicate_ip')
       flash[:error] = "There has been too many sign ups from this IP. Please try again later. If you believe this is an error, please email support@assemblyfour.com and include 'My IP is: #{request.ip}' in the email."
     end
