@@ -23,7 +23,7 @@ class Auth::RegistrationsController < Devise::RegistrationsController
     tags = ["country:#{ip_data[:country]}"]
     Stats.increment('users.new.attempt', tags: tags)
 
-    if allowed.zero? || User.confirmed.joins(:account).with_recent_ip_address(request.ip).where('accounts.suspended = true').where('users.created_at > ?', 1.month.ago).count >= MAX_SUSPENSIONS_FROM_IP
+    if allowed.zero? || User.confirmed.joins(:account).with_recent_ip_address(request.ip).where('accounts.suspended = true OR accounts.silenced = true').where('users.created_at > ?', 1.month.ago).count >= MAX_SUSPENSIONS_FROM_IP
       Stats.increment('users.new.suspended_ip', tags: tags)
       flash[:error] = "Your IP has been suspended. If you believe this is an error, please email support@assemblyfour.com and include 'My IP is: #{request.ip}' in the email."
       redirect_to new_user_registration_path
