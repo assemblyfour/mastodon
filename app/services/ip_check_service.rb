@@ -3,8 +3,12 @@
 class IPCheckService < BaseService
   IP_CHECK_URL = ENV.fetch('IP_CHECK_URL', nil)
 
+  DEFAULT = {
+    allowed: 3,
+    country: 'unknown'
+  }
   def call(ip)
-    return unless IP_CHECK_URL
+    return DEFAULT.clone unless IP_CHECK_URL
     response = Excon.get("#{IP_CHECK_URL}/#{ip}",
                 headers: {
                   "Content-Type" => "application/json",
@@ -18,9 +22,6 @@ class IPCheckService < BaseService
       country: body.fetch('country')
     }
   rescue Excon::Errors::HTTPStatusError, KeyError
-    {
-      allowed: 3,
-      country: 'unknown'
-    }
+    DEFAULT.clone
   end
 end
