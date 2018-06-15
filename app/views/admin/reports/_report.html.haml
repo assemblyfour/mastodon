@@ -1,8 +1,8 @@
-%tr
-  %td.id
-    = "##{report.id}"
+%tr{id: "report-#{report.id}"}
   %td.target
     = link_to report.target_account.acct, admin_account_path(report.target_account.id)
+    - if report.target_account.state != :confirmed
+      = "(#{report.target_account.state})"
   %td.reporter
     = link_to report.account.acct, admin_account_path(report.account.id)
   %td
@@ -17,10 +17,8 @@
         %span{ title: t('admin.accounts.media_attachments') }
           = fa_icon('camera')
           = report.media_attachments.count
-  %td
-    - if report.assigned_account.nil?
-      \-
-    - else
-      = link_to report.assigned_account.acct, admin_account_path(report.assigned_account.id)
+  %td= time_ago_in_words report.created_at
   %td
     = table_link_to 'circle', t('admin.reports.view'), admin_report_path(report)
+    = table_link_to 'check-circle', t('admin.reports.resolve'), admin_report_path(report, outcome: 'resolve'), remote: true, data: {'disable-with': 'Resolving...'}, method: :put
+    = table_link_to 'trash', t('admin.reports.spam'), admin_report_path(report, outcome: 'spam'), remote: true, data: {'disable-with': 'Processing...'}, method: :put

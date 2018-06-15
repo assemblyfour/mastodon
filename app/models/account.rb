@@ -130,6 +130,7 @@ class Account < ApplicationRecord
            :unconfirmed_email,
            :current_sign_in_ip,
            :current_sign_in_at,
+           :last_sign_in_ip,
            :confirmed?,
            :admin?,
            :moderator?,
@@ -151,6 +152,20 @@ class Account < ApplicationRecord
 
   def acct
     local? ? username : "#{username}@#{domain}"
+  end
+
+  def state
+    if suspended?
+      :suspended
+    elsif silenced?
+      :silenced
+    elsif user&.confirmed?
+      :confirmed
+    elsif local?
+      :unconfirmed
+    else
+      :remote
+    end
   end
 
   def local_username_and_domain

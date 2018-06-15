@@ -14,14 +14,15 @@
     %table.table
       %thead
         %tr
-          -# %th
-          %th= t('admin.reports.id')
           %th= t('admin.reports.target')
           %th= t('admin.reports.reported_by')
           %th= t('admin.reports.report_contents')
-          %th= t('admin.reports.assigned')
+          %th= t('admin.reports.age')
           %th
       %tbody
-        = render @reports
+        - @reports.each do |ip, reports|
+          %tr
+            %th{colspan: 5}= "IP: #{ip.to_s}"
+          = render reports
 
 = paginate @reports
