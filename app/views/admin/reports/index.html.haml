@@ -22,7 +22,9 @@
       %tbody
         - @reports.each do |ip, reports|
           %tr
-            %th{colspan: 5}= "IP: #{ip.to_s}"
+            %th{colspan: 5}
+              IP: 
+              = link_to ip.to_s, "https://ipapi.co/#{ip.to_s}"
           = render reports
 
 = paginate @reports

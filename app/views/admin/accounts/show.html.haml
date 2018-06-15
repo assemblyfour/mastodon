@@ -63,7 +63,7 @@
         %tr
           %th= t('admin.accounts.most_recent_ip')
           %td
-            = @account.user_current_sign_in_ip
+            = link_to @account.user_current_sign_in_ip, "https://ipapi.co/#{account.user_current_sign_in_ip}/"
             –
             - total_accounts = @account.user ? User.confirmed.where.not(id: @account.user.id).with_recent_ip_address(@account.user_current_sign_in_ip).count : 0
             - suspended_accounts = @account.user ? User.confirmed.joins(:account).where.not(id: @account.user.id).with_recent_ip_address(@account.user_current_sign_in_ip).where('accounts.suspended = true').count : 0
@@ -71,7 +71,8 @@
         %tr
           %th= t('admin.accounts.previous_ip')
           %td
-            = @account.user_last_sign_in_ip
+            = link_to @account.user_last_sign_in_ip, "https://ipapi.co/#{account.user_last_sign_in_ip}/"
+
             –
             - total_accounts = @account.user ? User.confirmed.where.not(id: @account.user.id).with_recent_ip_address(@account.user_last_sign_in_ip).count : 0
             - suspended_accounts = @account.user ? User.confirmed.joins(:account).where.not(id: @account.user.id).with_recent_ip_address(@account.user_last_sign_in_ip).where('accounts.suspended = true').count : 0
