@@ -46,6 +46,7 @@ class ListingSearchService < BaseService
   def filter_results(results)
     results.compact
            .group_by { |s| s.account }
+           .reject { |a| a.silenced? }
            .map { |account, statuses|
              if statuses.any?(&:explicit_listing?)
                statuses.select(&:explicit_listing?).sort_by(&:created_at).last
