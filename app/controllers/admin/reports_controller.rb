@@ -11,7 +11,9 @@ module Admin
 
     def index
       authorize :report, :index?
-      @reports = filtered_reports.page(params[:page])
+      reports = filtered_reports.group_by { |r| r.target_account_user&.current_sign_in_ip }.sort_by { |ip, reports| reports.count }.reverse
+
+      @reports = Kaminari.paginate_array(reports).page(params[:page])
     end
 
     def show
@@ -25,6 +27,10 @@ module Admin
     def update
       authorize @report, :update?
       process_report
+
+      if request.xhr?
+        return render js: "$('#report-#{@report.id}').fadeOut(500)"
+      end
 
       if @report.action_taken?
         redirect_to admin_reports_path, notice: I18n.t('admin.reports.resolved_msg')
@@ -49,6 +55,14 @@ module Admin
       when 'resolve'
         @report.resolve!(current_account)
         log_action :resolve, @report
+      when 'spam'
+        @report.target_account.update!(silenced: true)
+        @report.resolve!(current_account, note: 'Marked as spam')
+
+        log_action :resolve, @report
+        log_action :silence, @report.target_account
+
+        resolve_all_target_account_reports
       when 'temp_suspend'
         @report.resolve!(current_account)
         log_action :resolve, @report
@@ -95,7 +109,8 @@ module Admin
     def filtered_reports
       ReportFilter.new(filter_params).results.order(id: :desc).includes(
         :account,
-        :target_account
+        :target_account,
+        :target_account_user,
       )
     end
 

@@ -17,7 +17,7 @@ describe Admin::ReportsController do
 
       reports = assigns(:reports).to_a
       expect(reports.size).to eq 1
-      expect(reports[0]).to eq specified
+      expect(reports[0][1].first).to eq specified
       expect(response).to have_http_status(:success)
     end
 
@@ -29,7 +29,7 @@ describe Admin::ReportsController do
 
       reports = assigns(:reports).to_a
       expect(reports.size).to eq 1
-      expect(reports[0]).to eq specified
+      expect(reports[0][1].first).to eq specified
 
       expect(response).to have_http_status(:success)
     end

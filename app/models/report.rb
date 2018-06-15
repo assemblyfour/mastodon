@@ -21,6 +21,8 @@ class Report < ApplicationRecord
   belongs_to :action_taken_by_account, class_name: 'Account', optional: true
   belongs_to :assigned_account, class_name: 'Account', optional: true
 
+  has_one :target_account_user, class_name: 'User', through: :target_account, source: :user
+
   has_many :notes, class_name: 'ReportNote', foreign_key: :report_id, inverse_of: :report, dependent: :destroy
 
   scope :unresolved, -> { where(action_taken: false) }
@@ -48,7 +50,9 @@ class Report < ApplicationRecord
     update!(assigned_account_id: nil)
   end
 
-  def resolve!(acting_account)
+  def resolve!(acting_account, note: nil)
+    target_account.targeted_moderation_notes.create!(account: acting_account, content: note) if note
+
     update!(action_taken: true, action_taken_by_account_id: acting_account.id)
   end
 
