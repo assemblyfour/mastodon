@@ -7,7 +7,7 @@ class Stats
     end
   end
 
-  def self.method_missing(meth, *args, **kwargs)
-    statsd.send(meth, *args, **kwargs)
+  def self.method_missing(meth, *args, **kwargs, &block)
+    statsd.send(meth, *args, **kwargs, &block)
   end
 end
