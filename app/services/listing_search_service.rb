@@ -32,9 +32,7 @@ class ListingSearchService < BaseService
   private
 
   def all_listings
-    Rails.cache.fetch('listings/all_listings', expires_in: 1.minute, race_condition_ttl: 5.seconds) do
-      filter_results(self.class.listings)
-    end
+    filter_results(self.class.listings.limit(RESULTS))
   end
 
   def perform_listing_search!
