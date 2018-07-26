@@ -2,7 +2,7 @@
   %h1 Switter Listings
 
 %p
-  - cache 'listings_count', expires_in: 1.minute, race_condition_ttl: 5.seconds do
+  - cache 'listings_count', expires_in: 5.minutes, race_condition_ttl: 5.seconds do
     Search #{ListingSearchService.listings.count} active Switter listings posted in the last 30 days.
 = form_tag '/', method: 'GET', class: 'simple_form' do
   .fields-group
