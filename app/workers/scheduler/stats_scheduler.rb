@@ -36,11 +36,11 @@ class Scheduler::StatsScheduler
       b.gauge('users.count', User.confirmed.count, tags: ["state:confirmed"])
       b.gauge('users.count', User.where(confirmed_at: nil).count, tags: ["state:unconfirmed"])
 
-      ActiveRecord::Base.connection.select_all("SELECT count(distinct(account_id)) FILTER (WHERE created_at > now() - interval '24 hours') as day, count(distinct(account_id)) FILTER (WHERE created_at > now() - interval '7 days') as week, count(distinct(account_id)) FILTER (WHERE created_at > now() - interval '30 days') as month FROM statuses WHERE local = true").to_hash.first.each do |k, v|
+      ActiveRecord::Base.connection.select_all("SELECT count(distinct(account_id)) FILTER (WHERE updated_at > now() - interval '24 hours') as day, count(distinct(account_id)) FILTER (WHERE updated_at > now() - interval '7 days') as week, count(distinct(account_id)) FILTER (WHERE updated_at > now() - interval '30 days') as month FROM statuses WHERE local = true").to_hash.first.each do |k, v|
         b.gauge("users.interacted.#{k}", v)
       end
 
-      ActiveRecord::Base.connection.select_all("SELECT count(distinct(account_id)) FILTER (WHERE created_at > now() - interval '24 hours') as day, count(distinct(account_id)) FILTER (WHERE created_at > now() - interval '7 days') as week, count(distinct(account_id)) FILTER (WHERE created_at > now() - interval '30 days') as month FROM statuses WHERE local = true AND reply = false AND reblog_of_id IS NULL ").to_hash.first.each do |k, v|
+      ActiveRecord::Base.connection.select_all("SELECT count(distinct(account_id)) FILTER (WHERE updated_at > now() - interval '24 hours') as day, count(distinct(account_id)) FILTER (WHERE updated_at > now() - interval '7 days') as week, count(distinct(account_id)) FILTER (WHERE updated_at > now() - interval '30 days') as month FROM statuses WHERE local = true AND reply = false AND reblog_of_id IS NULL ").to_hash.first.each do |k, v|
         b.gauge("users.tooted.#{k}", v)
       end
 
@@ -50,8 +50,8 @@ class Scheduler::StatsScheduler
         month: 1.month.ago
       }.each do |period, time|
         b.gauge("users.active.#{period}", User.where('current_sign_in_at > ?', time).count)
-        b.gauge("listings.#{period}", ListingSearchService.listings.where('statuses.created_at > ?', time).count)
-        b.gauge("listings.accounts.#{period}", ListingSearchService.listings.reorder(nil).where('statuses.created_at > ?', time).distinct.count(:account_id))
+        b.gauge("listings.#{period}", ListingSearchService.listings.where('statuses.updated_at > ?', time).count)
+        b.gauge("listings.accounts.#{period}", ListingSearchService.listings.reorder(nil).where('statuses.updated_at > ?', time).distinct.count(:account_id))
       end
     end
   end
