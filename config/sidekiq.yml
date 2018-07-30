@@ -36,5 +36,5 @@
     cron: '<%= Random.rand(0..59) %> <%= Random.rand(3..5) %> * * *'
     class: Scheduler::BackupCleanupScheduler
   stats_scheduler:
-    cron: '*/15 * * * *'
+    cron: '0 * * * *'
     class: Scheduler::StatsScheduler
