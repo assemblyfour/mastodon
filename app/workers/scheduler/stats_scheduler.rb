@@ -29,10 +29,10 @@ class Scheduler::StatsScheduler
       b.gauge('mentions', Mention.count)
       b.gauge('mutes', Mute.count)
       b.gauge('notifications', Notification.count)
-      b.gauge('statuses.reblogs', Status.local.where('reblog_of_id IS NOT NULL'))
+      b.gauge('statuses.reblogs', Status.local.where('reblog_of_id IS NOT NULL').count)
       b.gauge('statuses.replies', Status.local.where(reply: true).count)
       b.gauge('statuses.toots', Status.local.without_replies.without_reblogs.count)
-      b.gauge('statuses.total', Status.local.count)
+      b.gauge('statuses.total', Account.local.sum(:statuses_count))
       b.gauge('users.count', User.confirmed.count, tags: ["state:confirmed"])
       b.gauge('users.count', User.where(confirmed_at: nil).count, tags: ["state:unconfirmed"])
 
