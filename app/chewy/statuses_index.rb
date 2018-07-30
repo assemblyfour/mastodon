@@ -31,7 +31,7 @@ class StatusesIndex < Chewy::Index
     },
   }
 
-  define_type ::Status.without_reblogs.local.where('created_at > ?', 7.days.ago) do
+  define_type ::Status.without_reblogs.local.where('updated_at > ?', 7.days.ago) do
     crutch :mentions do |collection|
       data = ::Mention.where(status_id: collection.map(&:id)).pluck(:status_id, :account_id)
       data.each.with_object({}) { |(id, name), result| (result[id] ||= []).push(name) }
