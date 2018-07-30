@@ -14,11 +14,11 @@ class SwlistingsValidator < ActiveModel::Validator
       status.errors.add(:base, 'You need a profile picture to post on the #swlisting hashtag')
     end
 
-    swlisting_statuses = status.account.statuses
-                                .tagged_with(Tag.find_by(name: 'swlisting'))
-                                .without_replies
-                                .without_reblogs
-                                .where(Status.arel_table[:created_at].gt(1.day.ago))
+    swlisting_statuses = status.account.statuses.
+                                tagged_with(Tag.find_by(name: 'swlisting')).
+                                without_replies.
+                                without_reblogs.
+                                where(Status.arel_table[:updated_at].gt(1.day.ago)).
 
     unless swlisting_statuses.count { |s| s.text =~ /#swlisting/ } < 3
       status.errors.add(:base, 'You can only post 3 times per day to #swlisting')

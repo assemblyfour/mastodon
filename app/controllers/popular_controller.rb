@@ -47,7 +47,7 @@ class PopularController < ApplicationController
             .with_public_visibility
             .without_replies
             .where('reblogs_count + favourites_count > ?', threshold)
-            .where('created_at BETWEEN ? AND ?', page.send(period).ago, (page - 1).send(period).ago)
+            .where('updated_at BETWEEN ? AND ?', page.send(period).ago, (page - 1).send(period).ago)
             .reorder('reblogs_count + favourites_count DESC')
             .limit(100)
             .group_by { |s| s.account }
