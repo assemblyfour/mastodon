@@ -31,7 +31,7 @@ class ListingsIndex < Chewy::Index
     },
   }
 
-  define_type ListingSearchService.listings.where('updated_at > ?', 30.days.ago) do
+  define_type ListingSearchService.listings.where('statuses.updated_at > ?', 30.days.ago) do
     root date_detection: false do
       field :account_id, type: 'long'
 
