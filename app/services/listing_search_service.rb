@@ -5,14 +5,13 @@ class ListingSearchService < BaseService
 
   RESULTS = 50
   def self.listings
-    ::Status.tagged_with(Tag.find_by(name: 'swlisting'))
-                       .local
-                       .without_replies
-                       .without_reblogs
-                       .excluding_silenced_accounts
-                       .where('statuses.created_at > ?', 30.days.ago)
-                       .where(visibility: [:public, :unlisted])
-                       .order('statuses.created_at DESC')
+    ::Status.tagged_with(Tag.find_by(name: 'swlisting')).
+                       local.
+                       without_replies.
+                       without_reblogs.
+                       excluding_silenced_accounts.
+                       where('statuses.updated_at > ?', 30.days.ago).
+                       where(visibility: [:public, :unlisted])
   end
 
   def call(query)
