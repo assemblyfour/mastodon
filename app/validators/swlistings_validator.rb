@@ -18,7 +18,7 @@ class SwlistingsValidator < ActiveModel::Validator
                                 tagged_with(Tag.find_by(name: 'swlisting')).
                                 without_replies.
                                 without_reblogs.
-                                where(Status.arel_table[:updated_at].gt(1.day.ago)).
+                                where(Status.arel_table[:updated_at].gt(1.day.ago))
 
     unless swlisting_statuses.count { |s| s.text =~ /#swlisting/ } < 3
       status.errors.add(:base, 'You can only post 3 times per day to #swlisting')
