@@ -31,6 +31,7 @@ gem 'chewy', '~> 5.0'
 gem 'cld3', '~> 3.2.0'
 gem 'devise', '~> 4.4'
 gem 'devise-two-factor', '~> 3.0'
+gem 'email_address'
 
 group :pam_authentication, optional: true do
   gem 'devise_pam_authenticatable2', '~> 9.1'
@@ -106,7 +107,7 @@ group :development, :test do
 end
 
 group :production, :test do
-  gem 'private_address_check', '~> 0.4.1'
+  gem 'private_address_check', '~> 0.5.0'
 end
 
 group :test do

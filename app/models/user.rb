@@ -3,7 +3,6 @@
 #
 # Table name: users
 #
-#  id                        :integer          not null, primary key
 #  email                     :string           default(""), not null
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
@@ -30,10 +29,11 @@
 #  last_emailed_at           :datetime
 #  otp_backup_codes          :string           is an Array
 #  filtered_languages        :string           default([]), not null, is an Array
-#  account_id                :integer          not null
+#  account_id                :bigint(8)        not null
+#  id                        :bigint(8)        not null, primary key
 #  disabled                  :boolean          default(FALSE), not null
 #  moderator                 :boolean          default(FALSE), not null
-#  invite_id                 :integer
+#  invite_id                 :bigint(8)
 #  remember_token            :string
 #
 
@@ -62,6 +62,9 @@ class User < ApplicationRecord
 
   has_many :applications, class_name: 'Doorkeeper::Application', as: :owner
   has_many :backups, inverse_of: :user
+
+  before_validation :canonicalize_email, if: :email_changed?
+  validate :ensure_unique_canonical_email, if: :email_changed?
 
   validates :locale, inclusion: I18n.available_locales.map(&:to_s), if: :locale?
   validates_with BlacklistedEmailValidator, if: :email_changed?
@@ -338,5 +341,15 @@ class User < ApplicationRecord
 
   def needs_feed_update?
     last_sign_in_at < ACTIVE_DURATION.ago
+  end
+
+  def canonicalize_email
+    self.canonical_email = EmailAddress.canonical(email)
+  end
+
+  def ensure_unique_canonical_email
+    if canonical_email.presence && User.where(canonical_email: canonical_email).any?
+      errors.add(:email, 'already in use')
+    end
   end
 end

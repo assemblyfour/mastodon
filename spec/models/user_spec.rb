@@ -40,6 +40,18 @@ RSpec.describe User, type: :model do
       expect(user.valid?).to be true
     end
 
+    it 'is invalid for normalized email that has been used' do
+      Fabricate(:user, email: 'john.smith@gmail.com')
+
+      %w(johnsmith@gmail.com john.smith+sneaky@gmail.com j.ohnsmith@gmail.com).each do |email|
+        user = Fabricate.build(:user, email: email)
+        expect(user).to_not be_valid
+        expect(user).to model_have_error_on_field(:email)
+      end
+
+      expect(Fabricate.build(:user, email: 'not.john.smith@gmail.com')).to be_valid
+    end
+
     it 'cleans out empty string from languages' do
       user = Fabricate.build(:user, filtered_languages: [''])
       user.valid?
