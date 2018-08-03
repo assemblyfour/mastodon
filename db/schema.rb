@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_09_045412) do
+ActiveRecord::Schema.define(version: 2018_08_03_045717) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -522,7 +522,9 @@ ActiveRecord::Schema.define(version: 2018_05_09_045412) do
     t.boolean "moderator", default: false, null: false
     t.bigint "invite_id"
     t.string "remember_token"
+    t.string "canonical_email"
     t.index ["account_id"], name: "index_users_on_account_id"
+    t.index ["canonical_email"], name: "index_users_on_canonical_email"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["filtered_languages"], name: "index_users_on_filtered_languages", using: :gin
