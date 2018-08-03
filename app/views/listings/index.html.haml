@@ -17,7 +17,7 @@
   - cache listing, expires_in: 2.weeks, race_condition_ttl: 1.minute do
     .activity-stream.activity-stream-headless.h-entry
       .entry
-        = render partial: "stream_entries/simple_status", locals: { status: listing, include_threads: false }
+        = render partial: "listing", locals: { status: listing, include_threads: false }
   %br
 
 - if @listings.empty?
@@ -35,3 +35,10 @@
     .actions
       %button Search
       = link_to 'Post a listing', '/new', class: 'button'
+
+:css
+  .listing__metadata {
+    font-size: 90%;
+    color: #666;
+    margin-bottom: 1em;
+  }
