@@ -497,7 +497,6 @@ const startWorker = (workerId) => {
     req.remoteAddress = ws._socket.remoteAddress;
 
     ws.isAlive = true;
-    ws.startedAt = (new Date()).getTime();
 
     ws.on('pong', () => {
       ws.isAlive = true;
@@ -542,18 +541,12 @@ const startWorker = (workerId) => {
   });
 
   setInterval(() => {
-    var ts = (new Date()).getTime();
     wss.clients.forEach(ws => {
       if (ws.isAlive === false) {
         ws.terminate();
         return;
       }
 
-      if ((ts - ws.startedAt) > 10 * 60 * 1000)  {
-        ws.terminate();
-        return;
-      }
-      
       ws.isAlive = false;
       ws.ping('', false, true);
     });
