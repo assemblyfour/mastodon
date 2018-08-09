@@ -16,6 +16,10 @@ class EmailMxValidator < ActiveModel::Validator
     return true if domain.nil?
 
     records = Resolv::DNS.new.getresources(domain, Resolv::DNS::Resource::IN::MX).to_a.map { |e| e.exchange.to_s }
+    records += records.map do |record|
+      Resolv::DNS.new.getresources(record, Resolv::DNS::Resource::IN::A).to_a.map { |e| e.address.to_s }
+    end
+    records.flatten!
     records.empty? || on_blacklist?(records)
   end
 
