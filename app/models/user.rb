@@ -348,7 +348,7 @@ class User < ApplicationRecord
   end
 
   def ensure_unique_canonical_email
-    if canonical_email.presence && User.find_by(canonical_email: canonical_email) != self
+    if canonical_email.presence && (user = User.find_by(canonical_email: canonical_email)) && user != self && !user.nil?
       errors.add(:email, 'already in use')
     end
   end
