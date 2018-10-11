@@ -48,7 +48,7 @@ class Api::V1::AccountsController < Api::BaseController
   private
 
   def set_account
-    @account = Account.find(params[:id])
+    @account = Account.without_suspended.find(params[:id])
   end
 
   def relationships(**options)
