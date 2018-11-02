@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe NotifyService do
+RSpec.describe NotifyService, type: :service do
   subject do
     -> { described_class.new.call(recipient, activity) }
   end
@@ -104,9 +104,9 @@ RSpec.describe NotifyService do
       is_expected.to change(Notification, :count)
     end
 
-    it 'hides reblogs when disabled' do
-      recipient.follow!(sender, reblogs: false)
-      is_expected.to_not change(Notification, :count)
+    it 'shows reblogs when disabled' do
+      recipient.follow!(sender, reblogs: true)
+      is_expected.to change(Notification, :count)
     end
   end
 

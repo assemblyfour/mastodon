@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -41,31 +42,74 @@ import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { HotKeys } from 'react-hotkeys';
 import { boostModal, deleteModal } from '../../initial_state';
-import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from '../../features/ui/util/fullscreen';
+import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from '../ui/util/fullscreen';
+import { textForScreenReader } from '../../components/status';
 
 const messages = defineMessages({
   deleteConfirm: { id: 'confirmations.delete.confirm', defaultMessage: 'Delete' },
   deleteMessage: { id: 'confirmations.delete.message', defaultMessage: 'Are you sure you want to delete this status?' },
+  redraftConfirm: { id: 'confirmations.redraft.confirm', defaultMessage: 'Delete & redraft' },
+  redraftMessage: { id: 'confirmations.redraft.message', defaultMessage: 'Are you sure you want to delete this status and re-draft it? Favourites and boosts will be lost, and replies to the original post will be orphaned.' },
   blockConfirm: { id: 'confirmations.block.confirm', defaultMessage: 'Block' },
   revealAll: { id: 'status.show_more_all', defaultMessage: 'Show more for all' },
   hideAll: { id: 'status.show_less_all', defaultMessage: 'Show less for all' },
+  detailedStatus: { id: 'status.detailed_status', defaultMessage: 'Detailed conversation view' },
+  replyConfirm: { id: 'confirmations.reply.confirm', defaultMessage: 'Reply' },
+  replyMessage: { id: 'confirmations.reply.message', defaultMessage: 'Replying now will overwrite the message you are currently composing. Are you sure you want to proceed?' },
 });
 
 const makeMapStateToProps = () => {
   const getStatus = makeGetStatus();
 
-  const mapStateToProps = (state, props) => ({
-    status: getStatus(state, props.params.statusId),
-    ancestorsIds: state.getIn(['contexts', 'ancestors', props.params.statusId]),
-    descendantsIds: state.getIn(['contexts', 'descendants', props.params.statusId]),
-  });
+  const mapStateToProps = (state, props) => {
+    const status = getStatus(state, { id: props.params.statusId });
+    let ancestorsIds = Immutable.List();
+    let descendantsIds = Immutable.List();
+
+    if (status) {
+      ancestorsIds = ancestorsIds.withMutations(mutable => {
+        let id = status.get('in_reply_to_id');
+
+        while (id) {
+          mutable.unshift(id);
+          id = state.getIn(['contexts', 'inReplyTos', id]);
+        }
+      });
+
+      descendantsIds = descendantsIds.withMutations(mutable => {
+        const ids = [status.get('id')];
+
+        while (ids.length > 0) {
+          let id        = ids.shift();
+          const replies = state.getIn(['contexts', 'replies', id]);
+
+          if (status.get('id') !== id) {
+            mutable.push(id);
+          }
+
+          if (replies) {
+            replies.reverse().forEach(reply => {
+              ids.unshift(reply);
+            });
+          }
+        }
+      });
+    }
+
+    return {
+      status,
+      ancestorsIds,
+      descendantsIds,
+      askReplyConfirmation: state.getIn(['compose', 'text']).trim().length !== 0,
+    };
+  };
 
   return mapStateToProps;
 };
 
-@injectIntl
+export default @injectIntl
 @connect(makeMapStateToProps)
-export default class Status extends ImmutablePureComponent {
+class Status extends ImmutablePureComponent {
 
   static contextTypes = {
     router: PropTypes.object,
@@ -78,6 +122,7 @@ export default class Status extends ImmutablePureComponent {
     ancestorsIds: ImmutablePropTypes.list,
     descendantsIds: ImmutablePropTypes.list,
     intl: PropTypes.object.isRequired,
+    askReplyConfirmation: PropTypes.bool,
   };
 
   state = {
@@ -116,7 +161,16 @@ export default class Status extends ImmutablePureComponent {
   }
 
   handleReplyClick = (status) => {
-    this.props.dispatch(replyCompose(status, this.context.router.history));
+    let { askReplyConfirmation, dispatch, intl } = this.props;
+    if (askReplyConfirmation) {
+      dispatch(openModal('CONFIRM', {
+        message: intl.formatMessage(messages.replyMessage),
+        confirm: intl.formatMessage(messages.replyConfirm),
+        onConfirm: () => dispatch(replyCompose(status, this.context.router.history)),
+      }));
+    } else {
+      dispatch(replyCompose(status, this.context.router.history));
+    }
   }
 
   handleModalReblog = (status) => {
@@ -127,7 +181,7 @@ export default class Status extends ImmutablePureComponent {
     if (status.get('reblogged')) {
       this.props.dispatch(unreblog(status));
     } else {
-      if (e.shiftKey || !boostModal) {
+      if ((e && e.shiftKey) || !boostModal) {
         this.handleModalReblog(status);
       } else {
         this.props.dispatch(openModal('BOOST', { status, onReblog: this.handleModalReblog }));
@@ -135,16 +189,16 @@ export default class Status extends ImmutablePureComponent {
     }
   }
 
-  handleDeleteClick = (status) => {
+  handleDeleteClick = (status, history, withRedraft = false) => {
     const { dispatch, intl } = this.props;
 
     if (!deleteModal) {
-      dispatch(deleteStatus(status.get('id')));
+      dispatch(deleteStatus(status.get('id'), history, withRedraft));
     } else {
       dispatch(openModal('CONFIRM', {
-        message: intl.formatMessage(messages.deleteMessage),
-        confirm: intl.formatMessage(messages.deleteConfirm),
-        onConfirm: () => dispatch(deleteStatus(status.get('id'))),
+        message: intl.formatMessage(withRedraft ? messages.redraftMessage : messages.deleteMessage),
+        confirm: intl.formatMessage(withRedraft ? messages.redraftConfirm : messages.deleteConfirm),
+        onConfirm: () => dispatch(deleteStatus(status.get('id'), history, withRedraft)),
       }));
     }
   }
@@ -237,11 +291,15 @@ export default class Status extends ImmutablePureComponent {
 
   handleHotkeyMention = e => {
     e.preventDefault();
-    this.handleMentionClick(this.props.status);
+    this.handleMentionClick(this.props.status.get('account'));
   }
 
   handleHotkeyOpenProfile = () => {
     this.context.router.history.push(`/accounts/${this.props.status.getIn(['account', 'id'])}`);
+  }
+
+  handleHotkeyToggleHidden = () => {
+    this.handleToggleHidden(this.props.status);
   }
 
   handleMoveUp = id => {
@@ -293,6 +351,7 @@ export default class Status extends ImmutablePureComponent {
         id={id}
         onMoveUp={this.handleMoveUp}
         onMoveDown={this.handleMoveDown}
+        contextType='thread'
       />
     ));
   }
@@ -311,7 +370,9 @@ export default class Status extends ImmutablePureComponent {
     if (status && ancestorsIds && ancestorsIds.size > 0) {
       const element = this.node.querySelectorAll('.focusable')[ancestorsIds.size - 1];
 
-      element.scrollIntoView(true);
+      window.requestAnimationFrame(() => {
+        element.scrollIntoView(true);
+      });
       this._scrolledIntoView = true;
     }
   }
@@ -326,7 +387,7 @@ export default class Status extends ImmutablePureComponent {
 
   render () {
     let ancestors, descendants;
-    const { status, ancestorsIds, descendantsIds, intl } = this.props;
+    const { shouldUpdateScroll, status, ancestorsIds, descendantsIds, intl } = this.props;
     const { fullscreen } = this.state;
 
     if (status === null) {
@@ -354,10 +415,11 @@ export default class Status extends ImmutablePureComponent {
       boost: this.handleHotkeyBoost,
       mention: this.handleHotkeyMention,
       openProfile: this.handleHotkeyOpenProfile,
+      toggleHidden: this.handleHotkeyToggleHidden,
     };
 
     return (
-      <Column>
+      <Column label={intl.formatMessage(messages.detailedStatus)}>
         <ColumnHeader
           showBackButton
           extraButton={(
@@ -365,12 +427,12 @@ export default class Status extends ImmutablePureComponent {
           )}
         />
 
-        <ScrollContainer scrollKey='thread'>
-          <div className={classNames('scrollable', 'detailed-status__wrapper', { fullscreen })} ref={this.setRef}>
+        <ScrollContainer scrollKey='thread' shouldUpdateScroll={shouldUpdateScroll}>
+          <div className={classNames('scrollable', { fullscreen })} ref={this.setRef}>
             {ancestors}
 
             <HotKeys handlers={handlers}>
-              <div className='focusable' tabIndex='0'>
+              <div className={classNames('focusable', 'detailed-status__wrapper')} tabIndex='0' aria-label={textForScreenReader(intl, status, false, !status.get('hidden'))}>
                 <DetailedStatus
                   status={status}
                   onOpenVideo={this.handleOpenVideo}

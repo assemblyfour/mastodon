@@ -1,11 +1,13 @@
 import api from '../api';
-import { CancelToken } from 'axios';
+import { CancelToken, isCancel } from 'axios';
 import { throttle } from 'lodash';
 import { search as emojiSearch } from '../features/emoji/emoji_mart_search_light';
 import { tagHistory } from '../settings';
 import { useEmoji } from './emojis';
+import resizeImage from '../utils/resize_image';
 import { importFetchedAccounts } from './importer';
 import { updateTimeline } from './timelines';
+import { showAlertForError } from './alerts';
 
 let cancelFetchComposeSuggestionsAccounts;
 
@@ -54,7 +56,7 @@ export function changeCompose(text) {
   };
 };
 
-export function replyCompose(status, router) {
+export function replyCompose(status, routerHistory) {
   return (dispatch, getState) => {
     dispatch({
       type: COMPOSE_REPLY,
@@ -62,7 +64,7 @@ export function replyCompose(status, router) {
     });
 
     if (!getState().getIn(['compose', 'mounted'])) {
-      router.push('/statuses/new');
+      routerHistory.push('/statuses/new');
     }
   };
 };
@@ -79,7 +81,7 @@ export function resetCompose() {
   };
 };
 
-export function mentionCompose(account, router) {
+export function mentionCompose(account, routerHistory) {
   return (dispatch, getState) => {
     dispatch({
       type: COMPOSE_MENTION,
@@ -87,12 +89,12 @@ export function mentionCompose(account, router) {
     });
 
     if (!getState().getIn(['compose', 'mounted'])) {
-      router.push('/statuses/new');
+      routerHistory.push('/statuses/new');
     }
   };
 };
 
-export function directCompose(account, router) {
+export function directCompose(account, routerHistory) {
   return (dispatch, getState) => {
     dispatch({
       type: COMPOSE_DIRECT,
@@ -100,12 +102,12 @@ export function directCompose(account, router) {
     });
 
     if (!getState().getIn(['compose', 'mounted'])) {
-      router.push('/statuses/new');
+      routerHistory.push('/statuses/new');
     }
   };
 };
 
-export function submitCompose() {
+export function submitCompose(routerHistory) {
   return function (dispatch, getState) {
     const status = getState().getIn(['compose', 'text'], '');
     const media  = getState().getIn(['compose', 'media_attachments']);
@@ -128,18 +130,23 @@ export function submitCompose() {
         'Idempotency-Key': getState().getIn(['compose', 'idempotencyKey']),
       },
     }).then(function (response) {
-      dispatch(insertIntoTagHistory(response.data.tags));
+      dispatch(insertIntoTagHistory(response.data.tags, status));
       dispatch(submitComposeSuccess({ ...response.data }));
 
-      // To make the app more responsive, immediately get the status into the columns
+      // To make the app more responsive, immediately push the status
+      // into the columns
 
-      const insertIfOnline = (timelineId) => {
+      const insertIfOnline = timelineId => {
         if (getState().getIn(['timelines', timelineId, 'items', 0]) !== null) {
           dispatch(updateTimeline(timelineId, { ...response.data }));
         }
       };
 
-      insertIfOnline('home');
+      if (response.data.visibility === 'direct' && getState().getIn(['conversations', 'mounted']) <= 0 && routerHistory) {
+        routerHistory.push('/timelines/direct');
+      } else if (response.data.visibility !== 'direct') {
+        insertIfOnline('home');
+      }
 
       if (response.data.in_reply_to_id === null && response.data.visibility === 'public') {
         insertIfOnline('community');
@@ -179,18 +186,14 @@ export function uploadCompose(files) {
 
     dispatch(uploadComposeRequest());
 
-    let data = new FormData();
-    data.append('file', files[0]);
+    resizeImage(files[0]).then(file => {
+      const data = new FormData();
+      data.append('file', file);
 
-    api(getState).post('/api/v1/media', data, {
-      onUploadProgress: function (e) {
-        dispatch(uploadComposeProgress(e.loaded, e.total));
-      },
-    }).then(function (response) {
-      dispatch(uploadComposeSuccess(response.data));
-    }).catch(function (error) {
-      dispatch(uploadComposeFail(error));
-    });
+      return api(getState).post('/api/v1/media', data, {
+        onUploadProgress: ({ loaded, total }) => dispatch(uploadComposeProgress(loaded, total)),
+      }).then(({ data }) => dispatch(uploadComposeSuccess(data)));
+    }).catch(error => dispatch(uploadComposeFail(error)));
   };
 };
 
@@ -291,6 +294,10 @@ const fetchComposeSuggestionsAccounts = throttle((dispatch, getState, token) => 
   }).then(response => {
     dispatch(importFetchedAccounts(response.data));
     dispatch(readyComposeSuggestionsAccounts(token, response.data));
+  }).catch(error => {
+    if (!isCancel(error)) {
+      dispatch(showAlertForError(error));
+    }
   });
 }, 200, { leading: true, trailing: true });
 
@@ -386,13 +393,13 @@ export function hydrateCompose() {
   };
 }
 
-function insertIntoTagHistory(tags) {
+function insertIntoTagHistory(recognizedTags, text) {
   return (dispatch, getState) => {
     const state = getState();
     const oldHistory = state.getIn(['compose', 'tagHistory']);
     const me = state.getIn(['meta', 'me']);
-    const names = tags.map(({ name }) => name);
-    const intersectedOldHistory = oldHistory.filter(name => !names.includes(name));
+    const names = recognizedTags.map(tag => text.match(new RegExp(`#${tag.name}`, 'i'))[0].slice(1));
+    const intersectedOldHistory = oldHistory.filter(name => names.findIndex(newName => newName.toLowerCase() === name.toLowerCase()) === -1);
 
     names.push(...intersectedOldHistory.toJS());
 
@@ -441,11 +448,12 @@ export function changeComposeVisibility(value) {
   };
 };
 
-export function insertEmojiCompose(position, emoji) {
+export function insertEmojiCompose(position, emoji, needsSpace) {
   return {
     type: COMPOSE_EMOJI_INSERT,
     position,
     emoji,
+    needsSpace,
   };
 };
 

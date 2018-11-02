@@ -8,6 +8,8 @@ import {
   blockAccount,
   unblockAccount,
   unmuteAccount,
+  pinAccount,
+  unpinAccount,
 } from '../../../actions/accounts';
 import {
   mentionCompose,
@@ -82,6 +84,14 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     }
   },
 
+  onEndorseToggle (account) {
+    if (account.getIn(['relationship', 'endorsed'])) {
+      dispatch(unpinAccount(account.get('id')));
+    } else {
+      dispatch(pinAccount(account.get('id')));
+    }
+  },
+
   onReport (account) {
     dispatch(initReport(account));
   },
@@ -94,16 +104,16 @@ const mapDispatchToProps = (dispatch, { intl }) => ({
     }
   },
 
-  onBlockDomain (domain, accountId) {
+  onBlockDomain (domain) {
     dispatch(openModal('CONFIRM', {
-      message: <FormattedMessage id='confirmations.domain_block.message' defaultMessage='Are you really, really sure you want to block the entire {domain}? In most cases a few targeted blocks or mutes are sufficient and preferable.' values={{ domain: <strong>{domain}</strong> }} />,
+      message: <FormattedMessage id='confirmations.domain_block.message' defaultMessage='Are you really, really sure you want to block the entire {domain}? In most cases a few targeted blocks or mutes are sufficient and preferable. You will not see content from that domain in any public timelines or your notifications. Your followers from that domain will be removed.' values={{ domain: <strong>{domain}</strong> }} />,
       confirm: intl.formatMessage(messages.blockDomainConfirm),
-      onConfirm: () => dispatch(blockDomain(domain, accountId)),
+      onConfirm: () => dispatch(blockDomain(domain)),
     }));
   },
 
-  onUnblockDomain (domain, accountId) {
-    dispatch(unblockDomain(domain, accountId));
+  onUnblockDomain (domain) {
+    dispatch(unblockDomain(domain));
   },
 
 });

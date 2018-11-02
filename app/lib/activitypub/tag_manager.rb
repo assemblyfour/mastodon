@@ -38,6 +38,10 @@ class ActivityPub::TagManager
     end
   end
 
+  def generate_uri_for(_target)
+    URI.join(root_url, 'payloads', SecureRandom.uuid)
+  end
+
   def activity_uri_for(target)
     raise ArgumentError, 'target must be a local activity' unless %i(note comment activity).include?(target.object_type) && target.local?
 
@@ -54,8 +58,8 @@ class ActivityPub::TagManager
       [COLLECTIONS[:public]]
     when 'unlisted', 'private'
       [account_followers_url(status.account)]
-    when 'direct'
-      status.mentions.map { |mention| uri_for(mention.account) }
+    when 'direct', 'limited'
+      status.active_mentions.map { |mention| uri_for(mention.account) }
     end
   end
 
@@ -76,12 +80,14 @@ class ActivityPub::TagManager
       cc << COLLECTIONS[:public]
     end
 
-    cc.concat(status.mentions.map { |mention| uri_for(mention.account) }) unless status.direct_visibility?
+    cc.concat(status.active_mentions.map { |mention| uri_for(mention.account) }) unless status.direct_visibility? || status.limited_visibility?
 
     cc
   end
 
   def local_uri?(uri)
+    return false if uri.nil?
+
     uri  = Addressable::URI.parse(uri)
     host = uri.normalized_host
     host = "#{host}:#{uri.port}" if uri.port
@@ -95,6 +101,8 @@ class ActivityPub::TagManager
   end
 
   def uri_to_resource(uri, klass)
+    return if uri.nil?
+
     if local_uri?(uri)
       case klass.name
       when 'Account'

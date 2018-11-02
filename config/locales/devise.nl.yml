@@ -8,11 +8,11 @@ nl:
     failure:
       already_authenticated: Je bent al ingelogd.
       inactive: Jouw account is nog niet geactiveerd.
-      invalid: Ongeldig e-mailadres of wachtwoord.
+      invalid: Ongeldig %{authentication_keys}.
       invalid_token: Ongeldige bevestigingscode.
       last_attempt: Je hebt nog één poging over voordat jouw account wordt opgeschort.
       locked: Jouw account is opgeschort.
-      not_found_in_database: Ongeldig e-mailadres of wachtwoord.
+      not_found_in_database: Ongeldig %{authentication_keys}.
       timeout: Jouw sessie is verlopen, log opnieuw in.
       unauthenticated: Je dient in te loggen of te registreren.
       unconfirmed: Je dient eerst jouw account te bevestigen.
@@ -20,7 +20,7 @@ nl:
       confirmation_instructions:
         action: E-mailadres verifiëren
         explanation: Je hebt een account op %{host} aangemaakt en met één klik kun je deze activeren. Wanneer jij dit account niet hebt aangemaakt, mag je deze e-mail negeren.
-        extra_html: Bekijk ook de <a href="%{terms_path}">regels van de Mastodonserver</a> en <a href="%{policy_path}">onze gebruikersvoorwaarden</a>.
+        extra_html: Bekijk ook de <a href="%{terms_path}">regels van de Mastodonserver</a> en <a href="%{policy_path}">onze gebruiksvoorwaarden</a>.
         subject: 'Mastodon: E-mail bevestigen voor %{instance}'
         title: E-mailadres verifiëren
       email_changed:

@@ -42,7 +42,7 @@ class Rack::Attack
   # (blocklist & throttles are skipped)
   Rack::Attack.safelist('allow from localhost') do |req|
     # Requests are allowed if the return value is truthy
-    '127.0.0.1' == req.ip || '::1' == req.ip
+    req.ip == '127.0.0.1' || req.ip == '::1'
   end
 
   throttle('throttle_authenticated_api', limit: 300, period: 5.minutes) do |req|
@@ -51,6 +51,10 @@ class Rack::Attack
 
   throttle('throttle_unauthenticated_api', limit: 7_500, period: 5.minutes) do |req|
     req.ip if req.api_request?
+  end
+
+  throttle('throttle_media', limit: 30, period: 30.minutes) do |req|
+    req.authenticated_user_id if req.post? && req.path.start_with?('/api/v1/media')
   end
 
   throttle('protected_paths', limit: 25, period: 5.minutes) do |req|
@@ -69,20 +73,5 @@ class Rack::Attack
     }
 
     [429, headers, [{ error: I18n.t('errors.429') }.to_json]]
-  end
-
-  (ENV['BLOCK_IPS'] || '').split(',').each do |ip|
-    begin
-      IPAddr.new(ip)
-      blocklist_ip(ip)
-    rescue IPAddr::InvalidAddressError
-      Rails.logger.error("Invalid IP for blocklist: #{ip}")
-    end
-  end
-
-  self.blocklisted_response = lambda do |env|
-    # Using 503 because it may make attacker think that they have successfully
-    # DOSed the site. Rack::Attack returns 403 for blocklists by default
-    [ 423, {}, ['Locked']]
   end
 end

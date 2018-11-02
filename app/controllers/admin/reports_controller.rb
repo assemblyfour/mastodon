@@ -18,10 +18,9 @@ module Admin
 
     def show
       authorize @report, :show?
-      @report_note = @report.notes.new
-      @report_notes = @report.notes.latest
-      @report_history = @report.history
-      @form = Form::StatusBatch.new
+      @report_note  = @report.notes.new
+      @report_notes = (@report.notes.latest + @report.history).sort_by(&:created_at)
+      @form         = Form::StatusBatch.new
     end
 
     def update
@@ -65,25 +64,35 @@ module Admin
         resolve_all_target_account_reports
       when 'temp_suspend'
         @report.resolve!(current_account)
+
         log_action :resolve, @report
         log_action :temp_suspend, @report.target_account
-        days = params[:admin_temp_suspend][:days].to_i
+
+        days   = params[:admin_temp_suspend][:days].to_i
         reason = params[:admin_temp_suspend][:reason]
+
         @report.target_account.update!(suspended_until: days.days.from_now, suspension_reason: reason)
         @current_account.report_notes.create!(report: @report, content: "Temporarily suspend account for #{days} days for: #{reason}")
       when 'undo_temp_suspend'
         log_action :unsuspend_account, @report.target_account
+
         @report.target_account.update!(suspended_until: nil, suspension_reason: nil)
         @current_account.report_notes.create!(report: @report, content: "Unsuspended account.")
-
       when 'suspend'
         Admin::SuspensionWorker.perform_async(@report.target_account.id)
 
         log_action :resolve, @report
         log_action :suspend, @report.target_account
+      when 'disable'
+        @report.resolve!(current_account)
+        @report.target_account.user.disable!
+
+        log_action :resolve, @report
+        log_action :disable, @report.target_account.user
 
         resolve_all_target_account_reports
       when 'silence'
+        @report.resolve!(current_account)
         @report.target_account.update!(silenced: true)
 
         log_action :resolve, @report
@@ -93,6 +102,7 @@ module Admin
       else
         raise ActiveRecord::RecordNotFound
       end
+
       @report.reload
     end
 

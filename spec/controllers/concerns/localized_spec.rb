@@ -11,20 +11,24 @@ describe ApplicationController, type: :controller do
     end
   end
 
+  around do |example|
+    current_locale = I18n.locale
+    example.run
+    I18n.locale = current_locale
+  end
+
   before do
     routes.draw { get 'success' => 'anonymous#success' }
   end
 
   shared_examples 'default locale' do
-    after { I18n.locale = I18n.default_locale }
-
     it 'sets available and preferred language' do
       request.headers['Accept-Language'] = 'ca-ES, fa'
       get 'success'
       expect(I18n.locale).to eq :fa
     end
 
-    it 'sets available and compatible langauge if none of available languages are preferred' do
+    it 'sets available and compatible language if none of available languages are preferred' do
       request.headers['Accept-Language'] = 'fa-IR'
       get 'success'
       expect(I18n.locale).to eq :fa

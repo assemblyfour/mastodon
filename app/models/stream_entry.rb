@@ -3,13 +3,13 @@
 #
 # Table name: stream_entries
 #
-#  id            :integer          not null, primary key
-#  activity_id   :integer
+#  id            :bigint(8)        not null, primary key
+#  activity_id   :bigint(8)
 #  activity_type :string
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  hidden        :boolean          default(FALSE), not null
-#  account_id    :integer
+#  account_id    :bigint(8)
 #
 
 class StreamEntry < ApplicationRecord
@@ -48,7 +48,7 @@ class StreamEntry < ApplicationRecord
   end
 
   def mentions
-    orphaned? ? [] : status.mentions.map(&:account)
+    orphaned? ? [] : status.active_mentions.map(&:account)
   end
 
   private

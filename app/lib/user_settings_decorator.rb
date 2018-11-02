@@ -15,19 +15,22 @@ class UserSettingsDecorator
   private
 
   def process_update
-    user.settings['notification_emails']     = merged_notification_emails if change?('notification_emails')
-    user.settings['interactions']            = merged_interactions if change?('interactions')
-    user.settings['default_privacy']         = default_privacy_preference if change?('setting_default_privacy')
-    user.settings['default_sensitive']       = default_sensitive_preference if change?('setting_default_sensitive')
-    user.settings['unfollow_modal']          = unfollow_modal_preference if change?('setting_unfollow_modal')
-    user.settings['boost_modal']             = boost_modal_preference if change?('setting_boost_modal')
-    user.settings['delete_modal']            = delete_modal_preference if change?('setting_delete_modal')
-    user.settings['auto_play_gif']           = auto_play_gif_preference if change?('setting_auto_play_gif')
-    user.settings['display_sensitive_media'] = display_sensitive_media_preference if change?('setting_display_sensitive_media')
-    user.settings['reduce_motion']           = reduce_motion_preference if change?('setting_reduce_motion')
-    user.settings['system_font_ui']          = system_font_ui_preference if change?('setting_system_font_ui')
-    user.settings['noindex']                 = noindex_preference if change?('setting_noindex')
-    user.settings['theme']                   = theme_preference if change?('setting_theme')
+    user.settings['notification_emails'] = merged_notification_emails if change?('notification_emails')
+    user.settings['interactions']        = merged_interactions if change?('interactions')
+    user.settings['default_privacy']     = default_privacy_preference if change?('setting_default_privacy')
+    user.settings['default_sensitive']   = default_sensitive_preference if change?('setting_default_sensitive')
+    user.settings['default_language']    = default_language_preference if change?('setting_default_language')
+    user.settings['unfollow_modal']      = unfollow_modal_preference if change?('setting_unfollow_modal')
+    user.settings['boost_modal']         = boost_modal_preference if change?('setting_boost_modal')
+    user.settings['delete_modal']        = delete_modal_preference if change?('setting_delete_modal')
+    user.settings['auto_play_gif']       = auto_play_gif_preference if change?('setting_auto_play_gif')
+    user.settings['display_media']       = display_media_preference if change?('setting_display_media')
+    user.settings['expand_spoilers']     = expand_spoilers_preference if change?('setting_expand_spoilers')
+    user.settings['reduce_motion']       = reduce_motion_preference if change?('setting_reduce_motion')
+    user.settings['system_font_ui']      = system_font_ui_preference if change?('setting_system_font_ui')
+    user.settings['noindex']             = noindex_preference if change?('setting_noindex')
+    user.settings['theme']               = theme_preference if change?('setting_theme')
+    user.settings['hide_network']        = hide_network_preference if change?('setting_hide_network')
   end
 
   def merged_notification_emails
@@ -66,8 +69,12 @@ class UserSettingsDecorator
     boolean_cast_setting 'setting_auto_play_gif'
   end
 
-  def display_sensitive_media_preference
-    boolean_cast_setting 'setting_display_sensitive_media'
+  def display_media_preference
+    settings['setting_display_media']
+  end
+
+  def expand_spoilers_preference
+    boolean_cast_setting 'setting_expand_spoilers'
   end
 
   def reduce_motion_preference
@@ -78,12 +85,20 @@ class UserSettingsDecorator
     boolean_cast_setting 'setting_noindex'
   end
 
+  def hide_network_preference
+    boolean_cast_setting 'setting_hide_network'
+  end
+
   def theme_preference
     settings['setting_theme']
   end
 
+  def default_language_preference
+    settings['setting_default_language']
+  end
+
   def boolean_cast_setting(key)
-    settings[key] == '1'
+    ActiveModel::Type::Boolean.new.cast(settings[key])
   end
 
   def coerced_settings(key)
@@ -91,7 +106,7 @@ class UserSettingsDecorator
   end
 
   def coerce_values(params_hash)
-    params_hash.transform_values { |x| x == '1' }
+    params_hash.transform_values { |x| ActiveModel::Type::Boolean.new.cast(x) }
   end
 
   def change?(key)

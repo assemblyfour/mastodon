@@ -12,7 +12,7 @@ class BatchedRemoveStatusService < BaseService
   def call(statuses)
     statuses = Status.where(id: statuses.map(&:id)).includes(:account, :stream_entry).flat_map { |status| [status] + status.reblogs.includes(:account, :stream_entry).to_a }
 
-    @mentions = statuses.map { |s| [s.id, s.mentions.includes(:account).to_a] }.to_h
+    @mentions = statuses.map { |s| [s.id, s.active_mentions.includes(:account).to_a] }.to_h
     @tags     = statuses.map { |s| [s.id, s.tags.pluck(:name)] }.to_h
 
     @stream_entry_batches  = []
@@ -21,7 +21,10 @@ class BatchedRemoveStatusService < BaseService
     @activity_xml          = {}
 
     # Ensure that rendered XML reflects destroyed state
-    statuses.each(&:destroy)
+    statuses.each do |status|
+      status.mark_for_mass_destruction!
+      status.destroy
+    end
 
     # Batch by source account
     statuses.group_by(&:account_id).each_value do |account_statuses|
@@ -52,7 +55,7 @@ class BatchedRemoveStatusService < BaseService
   end
 
   def unpush_from_home_timelines(account, statuses)
-    recipients = account.followers.local.to_a
+    recipients = account.followers_for_local_distribution.to_a
 
     recipients << account if account.local?
 
@@ -64,7 +67,7 @@ class BatchedRemoveStatusService < BaseService
   end
 
   def unpush_from_list_timelines(account, statuses)
-    account.lists.select(:id, :account_id).each do |list|
+    account.lists_for_local_distribution.select(:id, :account_id).each do |list|
       statuses.each do |status|
         FeedManager.instance.unpush_from_list(list, status)
       end
@@ -79,6 +82,11 @@ class BatchedRemoveStatusService < BaseService
     redis.pipelined do
       redis.publish('timeline:public', payload)
       redis.publish('timeline:public:local', payload) if status.local?
+
+      if status.media_attachments.any?
+        redis.publish('timeline:public:media', payload)
+        redis.publish('timeline:public:local:media', payload) if status.local?
+      end
 
       @tags[status.id].each do |hashtag|
         redis.publish("timeline:hashtag:#{hashtag}", payload)

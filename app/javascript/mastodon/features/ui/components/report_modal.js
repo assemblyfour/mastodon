@@ -30,16 +30,16 @@ const makeMapStateToProps = () => {
       account: getAccount(state, accountId),
       comment: state.getIn(['reports', 'new', 'comment']),
       forward: state.getIn(['reports', 'new', 'forward']),
-      statusIds: OrderedSet(state.getIn(['timelines', `account:${accountId}`, 'items'])).union(state.getIn(['reports', 'new', 'status_ids'])),
+      statusIds: OrderedSet(state.getIn(['timelines', `account:${accountId}:with_replies`, 'items'])).union(state.getIn(['reports', 'new', 'status_ids'])),
     };
   };
 
   return mapStateToProps;
 };
 
-@connect(makeMapStateToProps)
+export default @connect(makeMapStateToProps)
 @injectIntl
-export default class ReportModal extends ImmutablePureComponent {
+class ReportModal extends ImmutablePureComponent {
 
   static propTypes = {
     isSubmitting: PropTypes.bool,
@@ -63,13 +63,19 @@ export default class ReportModal extends ImmutablePureComponent {
     this.props.dispatch(submitReport());
   }
 
+  handleKeyDown = e => {
+    if (e.keyCode === 13 && (e.ctrlKey || e.metaKey)) {
+      this.handleSubmit();
+    }
+  }
+
   componentDidMount () {
-    this.props.dispatch(expandAccountTimeline(this.props.account.get('id')));
+    this.props.dispatch(expandAccountTimeline(this.props.account.get('id'), { withReplies: true }));
   }
 
   componentWillReceiveProps (nextProps) {
     if (this.props.account !== nextProps.account && nextProps.account) {
-      this.props.dispatch(expandAccountTimeline(nextProps.account.get('id')));
+      this.props.dispatch(expandAccountTimeline(nextProps.account.get('id'), { withReplies: true }));
     }
   }
 
@@ -98,7 +104,9 @@ export default class ReportModal extends ImmutablePureComponent {
               placeholder={intl.formatMessage(messages.placeholder)}
               value={comment}
               onChange={this.handleCommentChange}
+              onKeyDown={this.handleKeyDown}
               disabled={isSubmitting}
+              autoFocus
             />
 
             {domain && (

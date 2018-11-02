@@ -23,17 +23,17 @@ class Formatter
 
     unless status.local?
       html = reformat(raw_content)
-      html = encode_custom_emojis(html, status.emojis) if options[:custom_emojify]
+      html = encode_custom_emojis(html, status.emojis, options[:autoplay]) if options[:custom_emojify]
       return html.html_safe # rubocop:disable Rails/OutputSafety
     end
 
-    linkable_accounts = status.mentions.map(&:account)
+    linkable_accounts = status.active_mentions.map(&:account)
     linkable_accounts << status.account
 
     html = raw_content
     html = "RT @#{prepend_reblog} #{html}" if prepend_reblog
     html = encode_and_link_urls(html, linkable_accounts)
-    html = encode_custom_emojis(html, status.emojis) if options[:custom_emojify]
+    html = encode_custom_emojis(html, status.emojis, options[:autoplay]) if options[:custom_emojify]
     html = simple_format(html, {}, sanitize: false)
     html = html.delete("\n")
 
@@ -51,18 +51,32 @@ class Formatter
     strip_tags(text)
   end
 
-  def simplified_format(account)
-    return reformat(account.note).html_safe unless account.local? # rubocop:disable Rails/OutputSafety
-    linkify(account.note)
+  def simplified_format(account, **options)
+    html = account.local? ? linkify(account.note) : reformat(account.note)
+    html = encode_custom_emojis(html, account.emojis, options[:autoplay]) if options[:custom_emojify]
+    html.html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def sanitize(html, config)
     Sanitize.fragment(html, config)
   end
 
-  def format_spoiler(status)
+  def format_spoiler(status, **options)
     html = encode(status.spoiler_text)
-    html = encode_custom_emojis(html, status.emojis)
+    html = encode_custom_emojis(html, status.emojis, options[:autoplay])
+    html.html_safe # rubocop:disable Rails/OutputSafety
+  end
+
+  def format_display_name(account, **options)
+    html = encode(account.display_name.presence || account.username)
+    html = encode_custom_emojis(html, account.emojis, options[:autoplay]) if options[:custom_emojify]
+    html.html_safe # rubocop:disable Rails/OutputSafety
+  end
+
+  def format_field(account, str, **options)
+    return reformat(str).html_safe unless account.local? # rubocop:disable Rails/OutputSafety
+    html = encode_and_link_urls(str, me: true)
+    html = encode_custom_emojis(html, account.emojis, options[:autoplay]) if options[:custom_emojify]
     html.html_safe # rubocop:disable Rails/OutputSafety
   end
 
@@ -76,16 +90,25 @@ class Formatter
 
   private
 
-  def encode(html)
-    HTMLEntities.new.encode(html)
+  def html_entities
+    @html_entities ||= HTMLEntities.new
   end
 
-  def encode_and_link_urls(html, accounts = nil)
+  def encode(html)
+    html_entities.encode(html)
+  end
+
+  def encode_and_link_urls(html, accounts = nil, options = {})
     entities = Extractor.extract_entities_with_indices(html, extract_url_without_protocol: false)
+
+    if accounts.is_a?(Hash)
+      options  = accounts
+      accounts = nil
+    end
 
     rewrite(html.dup, entities) do |entity|
       if entity[:url]
-        link_to_url(entity)
+        link_to_url(entity, options)
       elsif entity[:hashtag]
         link_to_hashtag(entity)
       elsif entity[:screen_name]
@@ -101,10 +124,14 @@ class Formatter
     end
   end
 
-  def encode_custom_emojis(html, emojis)
+  def encode_custom_emojis(html, emojis, animate = false)
     return html if emojis.empty?
 
-    emoji_map = emojis.map { |e| [e.shortcode, full_asset_url(e.image.url(:static))] }.to_h
+    emoji_map = if animate
+                  emojis.map { |e| [e.shortcode, full_asset_url(e.image.url)] }.to_h
+                else
+                  emojis.map { |e| [e.shortcode, full_asset_url(e.image.url(:static))] }.to_h
+                end
 
     i                     = -1
     tag_open_index        = nil
@@ -120,7 +147,7 @@ class Formatter
         emoji     = emoji_map[shortcode]
 
         if emoji
-          replacement = "<img draggable=\"false\" class=\"emojione\" alt=\":#{shortcode}:\" title=\":#{shortcode}:\" src=\"#{emoji}\" />"
+          replacement = "<img draggable=\"false\" class=\"emojione\" alt=\":#{encode(shortcode)}:\" title=\":#{encode(shortcode)}:\" src=\"#{encode(emoji)}\" />"
           before_html = shortname_start_index.positive? ? html[0..shortname_start_index - 1] : ''
           html        = before_html + replacement + html[i + 1..-1]
           i          += replacement.size - (shortcode.size + 2) - 1
@@ -172,9 +199,11 @@ class Formatter
     result.flatten.join
   end
 
-  def link_to_url(entity)
+  def link_to_url(entity, options = {})
     url        = Addressable::URI.parse(entity[:url])
     html_attrs = { target: '_blank', rel: 'nofollow noopener' }
+
+    html_attrs[:rel] = "me #{html_attrs[:rel]}" if options[:me]
 
     Twitter::Autolink.send(:link_to_text, entity, link_html(entity[:url]), url, html_attrs)
   rescue Addressable::URI::InvalidURIError, IDN::Idna::IdnaError
@@ -187,16 +216,16 @@ class Formatter
     return link_to_account(acct) unless linkable_accounts
 
     account = linkable_accounts.find { |item| TagManager.instance.same_acct?(item.acct, acct) }
-    account ? mention_html(account) : "@#{acct}"
+    account ? mention_html(account) : "@#{encode(acct)}"
   end
 
   def link_to_account(acct)
     username, domain = acct.split('@')
 
     domain  = nil if TagManager.instance.local_domain?(domain)
-    account = Account.find_remote(username, domain)
+    account = EntityCache.instance.mention(username, domain)
 
-    account ? mention_html(account) : "@#{acct}"
+    account ? mention_html(account) : "@#{encode(acct)}"
   end
 
   def link_to_hashtag(entity)
@@ -214,10 +243,10 @@ class Formatter
   end
 
   def hashtag_html(tag)
-    "<a href=\"#{tag_url(tag.downcase)}\" class=\"mention hashtag\" rel=\"tag\">#<span>#{tag}</span></a>"
+    "<a href=\"#{encode(tag_url(tag.downcase))}\" class=\"mention hashtag\" rel=\"tag\">#<span>#{encode(tag)}</span></a>"
   end
 
   def mention_html(account)
-    "<span class=\"h-card\"><a href=\"#{TagManager.instance.url_for(account)}\" class=\"u-url mention\">@<span>#{account.username}</span></a></span>"
+    "<span class=\"h-card\"><a href=\"#{encode(TagManager.instance.url_for(account))}\" class=\"u-url mention\">@<span>#{encode(account.username)}</span></a></span>"
   end
 end

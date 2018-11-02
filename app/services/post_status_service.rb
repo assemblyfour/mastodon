@@ -13,40 +13,31 @@ class PostStatusService < BaseService
   # @option [Doorkeeper::Application] :application
   # @option [String] :idempotency Optional idempotency key
   # @return [Status]
-
   def call(account, text, in_reply_to = nil, **options)
     if options[:idempotency].present?
       existing_id = redis.get("idempotency:status:#{account.id}:#{options[:idempotency]}")
       return Status.find(existing_id) if existing_id
     end
 
-    media      = validate_media!(options[:media_ids])
-    status     = nil
-    text       = options.delete(:spoiler_text) if text.blank? && options[:spoiler_text].present?
-    text       = '.' if text.blank? && !media.empty?
-    visibility = options[:visibility] || account.user&.setting_default_privacy
-    sensitive  = options[:sensitive].nil? ? account.user&.setting_default_sensitive : options[:sensitive]
-
-    if media && media.any? { |m| m.file_meta && m.file_meta.fetch('nudity_level', 0) >= MediaAnalysisService::NUDITY_THRESHOLD } && account.targeted_reports.count >= 2
-      sensitive = true
-    end
+    media  = validate_media!(options[:media_ids])
+    status = nil
+    text   = options.delete(:spoiler_text) if text.blank? && options[:spoiler_text].present?
 
     ApplicationRecord.transaction do
       status = account.statuses.create!(text: text,
                                         media_attachments: media || [],
                                         thread: in_reply_to,
-                                        sensitive: sensitive,
+                                        sensitive: (options[:sensitive].nil? ? account.user&.setting_default_sensitive : options[:sensitive]) || options[:spoiler_text].present?,
                                         spoiler_text: options[:spoiler_text] || '',
-                                        visibility: visibility,
-                                        language: LanguageDetector.instance.detect(text, account),
+                                        visibility: options[:visibility] || account.user&.setting_default_privacy,
+                                        language: language_from_option(options[:language]) || account.user&.setting_default_language&.presence || LanguageDetector.instance.detect(text, account),
                                         application: options[:application])
     end
 
-    process_mentions_service.call(status)
     process_hashtags_service.call(status)
+    process_mentions_service.call(status)
 
     LinkCrawlWorker.perform_async(status.id) unless status.spoiler_text?
-    AutoTaggingWorker.perform_async(status.id) if status.public_visibility?
     DistributionWorker.perform_async(status.id)
     Pubsubhubbub::DistributionWorker.perform_async(status.stream_entry.id)
     ActivityPub::DistributionWorker.perform_async(status.id)
@@ -55,6 +46,8 @@ class PostStatusService < BaseService
     if options[:idempotency].present?
       redis.setex("idempotency:status:#{account.id}:#{options[:idempotency]}", 3_600, status.id)
     end
+
+    bump_potential_friendship(account, status)
 
     status
   end
@@ -73,6 +66,10 @@ class PostStatusService < BaseService
     media
   end
 
+  def language_from_option(str)
+    ISO_639.find(str)&.alpha2
+  end
+
   def process_mentions_service
     ProcessMentionsService.new
   end
@@ -83,5 +80,12 @@ class PostStatusService < BaseService
 
   def redis
     Redis.current
+  end
+
+  def bump_potential_friendship(account, status)
+    return if !status.reply? || account.id == status.in_reply_to_account_id
+    ActivityTracker.increment('activity:interactions')
+    return if account.following?(status.in_reply_to_account_id)
+    PotentialFriendshipTracker.record(account.id, status.in_reply_to_account_id, :reply)
   end
 end

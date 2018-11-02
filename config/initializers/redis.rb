@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-redis_connection = ConnectionPool::Wrapper.new(size: ENV.fetch('MAX_THREADS', 5).to_i, timeout: 3) do
-  Redis.new(
-   url: ENV['REDIS_URL'],
-    driver: :hiredis
-  )
-end
+redis_connection = Redis.new(
+  url: ENV['REDIS_URL'],
+  driver: :hiredis
+)
 
 namespace = ENV.fetch('REDIS_NAMESPACE') { nil }
 

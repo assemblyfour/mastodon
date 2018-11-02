@@ -43,8 +43,8 @@ class SearchPopout extends React.PureComponent {
 
 }
 
-@injectIntl
-export default class Search extends React.PureComponent {
+export default @injectIntl
+class Search extends React.PureComponent {
 
   static propTypes = {
     value: PropTypes.string.isRequired,
@@ -123,10 +123,6 @@ export default class Search extends React.PureComponent {
         <Overlay show={expanded && !hasValue} placement='bottom' target={this}>
           <SearchPopout />
         </Overlay>
-
-        <a href="https://listings.switter.at" target="_blank" className="load-more" style={{width: 'auto'}}>
-          <span>Want listings? Go to listings.switter.at</span>
-        </a>
       </div>
     );
   }

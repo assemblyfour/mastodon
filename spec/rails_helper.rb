@@ -29,6 +29,7 @@ Devise::Test::ControllerHelpers.module_eval do
       value: resource.activate_session(warden.request),
       expires: 1.year.from_now,
       httponly: true,
+      same_site: :lax,
     }
   end
 end
@@ -50,6 +51,14 @@ RSpec.configure do |config|
     Capybara.app_host = "http#{https ? 's' : ''}://#{ENV.fetch('LOCAL_DOMAIN')}"
   end
 
+  config.before :each, type: :controller do
+    stub_jsonld_contexts!
+  end
+
+  config.before :each, type: :service do
+    stub_jsonld_contexts!
+  end
+
   config.after :each do
     Rails.cache.clear
 
@@ -63,9 +72,15 @@ RSpec::Sidekiq.configure do |config|
 end
 
 def request_fixture(name)
-  File.read(File.join(Rails.root, 'spec', 'fixtures', 'requests', name))
+  File.read(Rails.root.join('spec', 'fixtures', 'requests', name))
 end
 
 def attachment_fixture(name)
-  File.open(File.join(Rails.root, 'spec', 'fixtures', 'files', name))
+  File.open(Rails.root.join('spec', 'fixtures', 'files', name))
+end
+
+def stub_jsonld_contexts!
+  stub_request(:get, 'https://www.w3.org/ns/activitystreams').to_return(request_fixture('json-ld.activitystreams.txt'))
+  stub_request(:get, 'https://w3id.org/identity/v1').to_return(request_fixture('json-ld.identity.txt'))
+  stub_request(:get, 'https://w3id.org/security/v1').to_return(request_fixture('json-ld.security.txt'))
 end

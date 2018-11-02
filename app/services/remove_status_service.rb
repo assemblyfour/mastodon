@@ -8,7 +8,7 @@ class RemoveStatusService < BaseService
     @status       = status
     @account      = status.account
     @tags         = status.tags.pluck(:name).to_a
-    @mentions     = status.mentions.includes(:account).to_a
+    @mentions     = status.active_mentions.includes(:account).to_a
     @reblogs      = status.reblogs.to_a
     @stream_entry = status.stream_entry
     @options      = options
@@ -20,6 +20,7 @@ class RemoveStatusService < BaseService
     remove_reblogs
     remove_from_hashtags
     remove_from_public
+    remove_from_media if status.media_attachments.any?
 
     @status.destroy!
 
@@ -41,13 +42,13 @@ class RemoveStatusService < BaseService
   end
 
   def remove_from_followers
-    @account.followers.local.find_each do |follower|
+    @account.followers_for_local_distribution.reorder(nil).find_each do |follower|
       FeedManager.instance.unpush_from_home(follower, @status)
     end
   end
 
   def remove_from_lists
-    @account.lists.select(:id, :account_id).find_each do |list|
+    @account.lists_for_local_distribution.select(:id, :account_id).reorder(nil).find_each do |list|
       FeedManager.instance.unpush_from_list(list, @status)
     end
   end
@@ -65,7 +66,9 @@ class RemoveStatusService < BaseService
     # delete notification - so here, we explicitly
     # send it to them
 
-    target_accounts = (@mentions.map(&:account).reject(&:local?) + @reblogs.map(&:account).reject(&:local?)).uniq(&:id)
+    target_accounts = (@mentions.map(&:account).reject(&:local?) + @reblogs.map(&:account).reject(&:local?))
+    target_accounts << @status.reblog.account if @status.reblog? && !@status.reblog.account.local?
+    target_accounts.uniq!(&:id)
 
     # Ostatus
     NotificationWorker.push_bulk(target_accounts.select(&:ostatus?).uniq(&:domain)) do |target_account|
@@ -84,6 +87,18 @@ class RemoveStatusService < BaseService
 
     # ActivityPub
     ActivityPub::DeliveryWorker.push_bulk(@account.followers.inboxes) do |inbox_url|
+      [signed_activity_json, @account.id, inbox_url]
+    end
+
+    relay! if relayable?
+  end
+
+  def relayable?
+    @status.public_visibility?
+  end
+
+  def relay!
+    ActivityPub::DeliveryWorker.push_bulk(Relay.enabled.pluck(:inbox_url)) do |inbox_url|
       [signed_activity_json, @account.id, inbox_url]
     end
   end
@@ -128,6 +143,13 @@ class RemoveStatusService < BaseService
 
     Redis.current.publish('timeline:public', @payload)
     Redis.current.publish('timeline:public:local', @payload) if @status.local?
+  end
+
+  def remove_from_media
+    return unless @status.public_visibility?
+
+    Redis.current.publish('timeline:public:media', @payload)
+    Redis.current.publish('timeline:public:local:media', @payload) if @status.local?
   end
 
   def redis

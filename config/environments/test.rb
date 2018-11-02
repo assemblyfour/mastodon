@@ -23,7 +23,7 @@ Rails.application.configure do
   config.consider_all_requests_local       = true
   config.action_controller.perform_caching = false
 
-  # The default store, file_store is shared by processses parallely executed
+  # The default store, file_store is shared by processes parallelly executed
   # and should not be used.
   config.cache_store = :memory_store
 
@@ -59,3 +59,14 @@ Rails.application.configure do
 end
 
 Paperclip::Attachment.default_options[:path] = "#{Rails.root}/spec/test_files/:class/:id_partition/:style.:extension"
+
+# set fake_data for pam, don't do real calls, just use fake data
+if ENV['PAM_ENABLED'] == 'true'
+  Rpam2.fake_data =
+    {
+      usernames: Set['pam_user1', 'pam_user2'],
+      servicenames: Set['pam_test', 'pam_test_controlled'],
+      password: '123456',
+      env: { email: 'pam@example.com' }
+    }
+end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe FetchAtomService do
+RSpec.describe FetchAtomService, type: :service do
   describe '#call' do
     let(:url) { 'http://example.com' }
     subject { FetchAtomService.new.call(url) }
@@ -57,7 +57,7 @@ RSpec.describe FetchAtomService do
       context 'content type is application/atom+xml' do
         let(:content_type) { 'application/atom+xml' }
 
-        it { is_expected.to eq [url, {:prefetched_body=>""}, :ostatus] }
+        it { is_expected.to eq [url, { :prefetched_body => "" }, :ostatus] }
       end
 
       context 'content_type is json' do

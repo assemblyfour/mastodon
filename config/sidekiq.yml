@@ -1,11 +1,11 @@
 ---
 :concurrency: <%= ENV.fetch('MAX_THREADS', 15).to_i %>
 :queues:
-  - critical
-  - realtime
-  - mailers
-  - default
-  - push
+  - [critical, 10]
+  - [realtime, 8]
+  - [mailers, 6]
+  - [default, 4]
+  - [push, 2]
   - pull
 :schedule:
   subscriptions_scheduler:
@@ -38,3 +38,6 @@
   stats_scheduler:
     cron: '0 * * * *'
     class: Scheduler::StatsScheduler
+  pghero_scheduler:
+    cron: '0 0 * * *'
+    class: Scheduler::PgheroScheduler

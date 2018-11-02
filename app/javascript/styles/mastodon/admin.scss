@@ -1,3 +1,5 @@
+$no-columns-breakpoint: 600px;
+
 .admin-wrapper {
   display: flex;
   justify-content: center;
@@ -24,16 +26,26 @@
       height: 100px;
     }
 
+    @media screen and (max-width: $no-columns-breakpoint) {
+      & > a:first-child {
+        display: none;
+      }
+    }
+
     ul {
       list-style: none;
       border-radius: 4px 0 0 4px;
       overflow: hidden;
       margin-bottom: 20px;
 
+      @media screen and (max-width: $no-columns-breakpoint) {
+        margin-bottom: 0;
+      }
+
       a {
         display: block;
         padding: 15px;
-        color: rgba($primary-text-color, 0.7);
+        color: $darker-text-color;
         text-decoration: none;
         transition: all 200ms linear;
         border-radius: 4px 0 0 4px;
@@ -62,19 +74,23 @@
         a {
           border: 0;
           padding: 15px 35px;
-
-          &.selected {
-            color: $primary-text-color;
-            background-color: $ui-highlight-color;
-            border-bottom: 0;
-            border-radius: 0;
-
-            &:hover {
-              background-color: lighten($ui-highlight-color, 5%);
-            }
-          }
         }
       }
+
+      .simple-navigation-active-leaf a {
+        color: $primary-text-color;
+        background-color: $ui-highlight-color;
+        border-bottom: 0;
+        border-radius: 0;
+
+        &:hover {
+          background-color: lighten($ui-highlight-color, 5%);
+        }
+      }
+    }
+
+    & > ul > .simple-navigation-active-leaf a {
+      border-radius: 4px 0 0 4px;
     }
   }
 
@@ -84,20 +100,29 @@
   }
 
   .content {
+    max-width: 700px;
     padding: 20px 15px;
     padding-top: 60px;
     padding-left: 25px;
 
+    @media screen and (max-width: $no-columns-breakpoint) {
+      max-width: none;
+      padding: 15px;
+      padding-top: 30px;
+    }
+
     h2 {
-      color: $ui-secondary-color;
+      color: $secondary-text-color;
       font-size: 24px;
       line-height: 28px;
       font-weight: 400;
+      padding-bottom: 40px;
+      border-bottom: 1px solid lighten($ui-base-color, 8%);
       margin-bottom: 40px;
     }
 
     h3 {
-      color: $ui-secondary-color;
+      color: $secondary-text-color;
       font-size: 20px;
       line-height: 28px;
       font-weight: 400;
@@ -107,8 +132,8 @@
     h4 {
       text-transform: uppercase;
       font-size: 13px;
-      font-weight: 500;
-      color: $ui-primary-color;
+      font-weight: 700;
+      color: $darker-text-color;
       padding-bottom: 8px;
       margin-bottom: 8px;
       border-bottom: 1px solid lighten($ui-base-color, 8%);
@@ -116,15 +141,20 @@
 
     h6 {
       font-size: 16px;
-      color: $ui-secondary-color;
+      color: $secondary-text-color;
       line-height: 28px;
       font-weight: 400;
+    }
+
+    .fields-group h6 {
+      color: $primary-text-color;
+      font-weight: 500;
     }
 
     & > p {
       font-size: 14px;
       line-height: 18px;
-      color: $ui-secondary-color;
+      color: $secondary-text-color;
       margin-bottom: 20px;
 
       strong {
@@ -140,22 +170,23 @@
     }
 
     hr {
-      margin: 20px 0;
+      width: 100%;
+      height: 0;
       border: 0;
-      background: transparent;
-      border-bottom: 1px solid $ui-base-color;
+      border-bottom: 1px solid rgba($ui-base-lighter-color, .6);
+      margin: 20px 0;
 
-      &.section-break {
-        margin: 30px 0;
-        border-bottom: 2px solid $ui-base-lighter-color;
+      &.spacer {
+        height: 1px;
+        border: 0;
       }
     }
 
     .muted-hint {
-      color: $ui-primary-color;
+      color: $darker-text-color;
 
       a {
-        color: $ui-highlight-color;
+        color: $highlight-text-color;
       }
     }
 
@@ -163,32 +194,14 @@
       color: $valid-value-color;
       font-weight: 500;
     }
-  }
 
-  .simple_form {
-    max-width: 400px;
-
-    &.edit_user,
-    &.new_form_admin_settings,
-    &.new_form_two_factor_confirmation,
-    &.new_form_delete_confirmation,
-    &.new_import,
-    &.new_domain_block,
-    &.edit_domain_block {
-      max-width: none;
-    }
-
-    .form_two_factor_confirmation_code,
-    .form_delete_confirmation_password {
-      max-width: 400px;
-    }
-
-    .actions {
-      max-width: 400px;
+    .negative-hint {
+      color: $error-value-color;
+      font-weight: 500;
     }
   }
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: $no-columns-breakpoint) {
     display: block;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -202,16 +215,8 @@
 
     .sidebar {
       width: 100%;
-      padding: 10px 0;
+      padding: 0;
       height: auto;
-
-      .logo {
-        margin: 20px auto;
-      }
-    }
-
-    .content {
-      padding-top: 20px;
     }
   }
 }
@@ -252,7 +257,7 @@
 
     a {
       display: inline-block;
-      color: rgba($primary-text-color, 0.7);
+      color: $darker-text-color;
       text-decoration: none;
       text-transform: uppercase;
       font-size: 12px;
@@ -265,7 +270,7 @@
       }
 
       &.selected {
-        color: $ui-highlight-color;
+        color: $highlight-text-color;
         border-bottom: 2px solid $ui-highlight-color;
       }
     }
@@ -290,7 +295,7 @@
     font-weight: 500;
     font-size: 14px;
     line-height: 18px;
-    color: $ui-secondary-color;
+    color: $secondary-text-color;
 
     @each $lang in $cjk-langs {
       &:lang(#{$lang}) {
@@ -334,34 +339,9 @@
   }
 }
 
-.report-note__comment {
-  margin-bottom: 20px;
-}
-
-.report-note__form {
-  margin-bottom: 20px;
-
-  .report-note__textarea {
-    box-sizing: border-box;
-    border: 0;
-    padding: 7px 4px;
-    margin-bottom: 10px;
-    font-size: 16px;
-    color: $ui-base-color;
-    display: block;
-    width: 100%;
-    outline: 0;
-    font-family: inherit;
-    resize: vertical;
-  }
-
-  .report-note__buttons {
-    text-align: right;
-  }
-
-  .report-note__button {
-    margin: 0 0 5px 5px;
-  }
+.simple_form.new_report_note,
+.simple_form.new_account_moderation_note {
+  max-width: 100%;
 }
 
 .batch-form-box {
@@ -389,19 +369,12 @@
   }
 }
 
-.batch-checkbox,
-.batch-checkbox-all {
-  display: flex;
-  align-items: center;
-  margin-right: 5px;
-}
-
 .back-link {
   margin-bottom: 10px;
   font-size: 14px;
 
   a {
-    color: $classic-highlight-color;
+    color: $highlight-text-color;
     text-decoration: none;
 
     &:hover {
@@ -415,7 +388,7 @@
 }
 
 .log-entry {
-  margin-bottom: 8px;
+  margin-bottom: 20px;
   line-height: 20px;
 
   &__header {
@@ -424,7 +397,7 @@
     align-items: center;
     padding: 10px;
     background: $ui-base-color;
-    color: $ui-primary-color;
+    color: $darker-text-color;
     border-radius: 4px 4px 0 0;
     font-size: 14px;
     position: relative;
@@ -451,15 +424,15 @@
   }
 
   &__timestamp {
-    color: lighten($ui-base-color, 34%);
+    color: $dark-text-color;
   }
 
   &__extras {
     background: lighten($ui-base-color, 6%);
     border-radius: 0 0 4px 4px;
     padding: 10px;
-    color: $ui-primary-color;
-    font-family: 'mastodon-font-monospace', monospace;
+    color: $darker-text-color;
+    font-family: $font-monospace, monospace;
     font-size: 12px;
     word-wrap: break-word;
     min-height: 20px;
@@ -468,7 +441,7 @@
   &__icon {
     font-size: 28px;
     margin-right: 10px;
-    color: lighten($ui-base-color, 34%);
+    color: $dark-text-color;
   }
 
   &__icon__overlay {
@@ -484,7 +457,7 @@
     }
 
     &.negative {
-      background: $error-red;
+      background: lighten($error-red, 12%);
     }
 
     &.neutral {
@@ -495,17 +468,17 @@
   a,
   .username,
   .target {
-    color: $ui-secondary-color;
+    color: $secondary-text-color;
     text-decoration: none;
     font-weight: 500;
   }
 
   .diff-old {
-    color: $error-red;
+    color: lighten($error-red, 12%);
   }
 
   .diff-neutral {
-    color: $ui-secondary-color;
+    color: $secondary-text-color;
   }
 
   .diff-new {
@@ -513,6 +486,31 @@
   }
 }
 
+a.name-tag,
+.name-tag,
+a.inline-name-tag,
+.inline-name-tag {
+  text-decoration: none;
+  color: $secondary-text-color;
+
+  .username {
+    font-weight: 500;
+  }
+
+  &.suspended {
+    .username {
+      text-decoration: line-through;
+      color: lighten($error-red, 12%);
+    }
+
+    .avatar {
+      filter: grayscale(100%);
+      opacity: 0.8;
+    }
+  }
+}
+
+a.name-tag,
 .name-tag {
   display: flex;
   align-items: center;
@@ -524,7 +522,145 @@
     border-radius: 50%;
   }
 
-  .username {
-    font-weight: 500;
+  &.suspended {
+    .avatar {
+      filter: grayscale(100%);
+      opacity: 0.8;
+    }
   }
+}
+
+.speech-bubble {
+  margin-bottom: 20px;
+  border-left: 4px solid $ui-highlight-color;
+
+  &.positive {
+    border-left-color: $success-green;
+  }
+
+  &.negative {
+    border-left-color: lighten($error-red, 12%);
+  }
+
+  &__bubble {
+    padding: 16px;
+    padding-left: 14px;
+    font-size: 15px;
+    line-height: 20px;
+    border-radius: 4px 4px 4px 0;
+    position: relative;
+    font-weight: 500;
+
+    a {
+      color: $darker-text-color;
+    }
+  }
+
+  &__owner {
+    padding: 8px;
+    padding-left: 12px;
+  }
+
+  time {
+    color: $dark-text-color;
+  }
+}
+
+.report-card {
+  background: $ui-base-color;
+  border-radius: 4px;
+  margin-bottom: 20px;
+
+  &__profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+
+    .account {
+      padding: 0;
+      border: 0;
+
+      &__avatar-wrapper {
+        margin-left: 0;
+      }
+    }
+
+    &__stats {
+      flex: 0 0 auto;
+      font-weight: 500;
+      color: $darker-text-color;
+      text-transform: uppercase;
+      text-align: right;
+
+      a {
+        color: inherit;
+        text-decoration: none;
+
+        &:focus,
+        &:hover,
+        &:active {
+          color: lighten($darker-text-color, 8%);
+        }
+      }
+
+      .red {
+        color: $error-value-color;
+      }
+    }
+  }
+
+  &__summary {
+    &__item {
+      display: flex;
+      justify-content: flex-start;
+      border-top: 1px solid darken($ui-base-color, 4%);
+
+      &:hover {
+        background: lighten($ui-base-color, 2%);
+      }
+
+      &__reported-by,
+      &__assigned {
+        padding: 15px;
+        flex: 0 0 auto;
+        box-sizing: border-box;
+        width: 150px;
+        color: $darker-text-color;
+
+        &,
+        .username {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+
+      &__content {
+        flex: 1 1 auto;
+        max-width: calc(100% - 300px);
+
+        &__icon {
+          color: $dark-text-color;
+          margin-right: 4px;
+          font-weight: 500;
+        }
+      }
+
+      &__content a {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 15px;
+        text-decoration: none;
+        color: $darker-text-color;
+      }
+    }
+  }
+}
+
+.one-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

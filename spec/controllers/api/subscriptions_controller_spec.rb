@@ -12,7 +12,7 @@ RSpec.describe Api::SubscriptionsController, type: :controller do
       end
 
       it 'returns http success' do
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
       end
 
       it 'echoes back the challenge' do
@@ -27,13 +27,13 @@ RSpec.describe Api::SubscriptionsController, type: :controller do
       end
 
       it 'returns http success' do
-        expect(response).to have_http_status(:missing)
+        expect(response).to have_http_status(404)
       end
     end
   end
 
   describe 'POST #update' do
-    let(:feed) { File.read(File.join(Rails.root, 'spec', 'fixtures', 'push', 'feed.atom')) }
+    let(:feed) { File.read(Rails.root.join('spec', 'fixtures', 'push', 'feed.atom')) }
 
     before do
       stub_request(:post, "https://quitter.no/main/push/hub").to_return(:status => 200, :body => "", :headers => {})
@@ -53,13 +53,12 @@ RSpec.describe Api::SubscriptionsController, type: :controller do
       stub_request(:any, "https://mastodon.social/users/Gargron").to_return(status: 404)
 
       request.env['HTTP_X_HUB_SIGNATURE'] = "sha1=#{OpenSSL::HMAC.hexdigest('sha1', 'abc', feed)}"
-      request.env['RAW_POST_DATA'] = feed
 
-      post :update, params: { id: account.id }
+      post :update, params: { id: account.id }, body: feed
     end
 
     it 'returns http success' do
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
 
     it 'creates statuses for feed' do

@@ -5,7 +5,7 @@ require 'rails_helper'
 describe Api::V1::Timelines::PublicController do
   render_views
 
-  let(:user)  { Fabricate(:user, account: Fabricate(:account, username: 'alice')) }
+  let(:user) { Fabricate(:user, account: Fabricate(:account, username: 'alice')) }
 
   before do
     allow(controller).to receive(:doorkeeper_token) { token }
@@ -22,7 +22,7 @@ describe Api::V1::Timelines::PublicController do
       it 'returns http success' do
         get :show
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.headers['Link'].links.size).to eq(2)
       end
     end
@@ -35,7 +35,7 @@ describe Api::V1::Timelines::PublicController do
       it 'returns http success' do
         get :show, params: { local: true }
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.headers['Link'].links.size).to eq(2)
       end
     end
@@ -48,7 +48,7 @@ describe Api::V1::Timelines::PublicController do
       it 'returns http success' do
         get :show
 
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(200)
         expect(response.headers['Link']).to be_nil
       end
     end

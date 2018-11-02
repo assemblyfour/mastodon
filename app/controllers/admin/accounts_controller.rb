@@ -82,7 +82,6 @@ module Admin
       redirect_to admin_account_path(@account.id)
     end
 
-
     private
 
     def set_account
@@ -107,7 +106,7 @@ module Admin
         :remote,
         :by_domain,
         :silenced,
-        :recent,
+        :alphabetic,
         :suspended,
         :username,
         :display_name,

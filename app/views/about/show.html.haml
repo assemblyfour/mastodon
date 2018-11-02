@@ -56,14 +56,14 @@
                 .information-board__section
                   %span= t 'about.user_count_before'
                   %strong= number_with_delimiter @instance_presenter.user_count
-                  %span= t 'about.user_count_after'
+                  %span= t 'about.user_count_after', count: @instance_presenter.user_count
                 .information-board__section
                   %span= t 'about.status_count_before'
                   %strong= number_with_delimiter @instance_presenter.status_count
-                  %span= t 'about.status_count_after'
+                  %span= t 'about.status_count_after', count: @instance_presenter.status_count
               .row__mascot
                 .landing-page__mascot
-                  = image_tag asset_pack_path('elephant_ui_plane.svg')
+                  = image_tag @instance_presenter.mascot&.file&.url || asset_pack_path('elephant_ui_plane.svg'), alt: ''
 
       - else
         .column-2.non-preview
@@ -88,14 +88,14 @@
                 .information-board__section
                   %span= t 'about.user_count_before'
                   %strong= number_with_delimiter @instance_presenter.user_count
-                  %span= t 'about.user_count_after'
+                  %span= t 'about.user_count_after', count: @instance_presenter.user_count
                 .information-board__section
                   %span= t 'about.status_count_before'
                   %strong= number_with_delimiter @instance_presenter.status_count
-                  %span= t 'about.status_count_after'
+                  %span= t 'about.status_count_after', count: @instance_presenter.status_count
               .row__mascot
                 .landing-page__mascot
-                  = image_tag asset_pack_path('elephant_ui_plane.svg')
+                  = image_tag @instance_presenter.mascot&.file&.url || asset_pack_path('elephant_ui_plane.svg'), alt: ''
 
       - if Setting.timeline_preview
         .column-3
@@ -108,6 +108,9 @@
               %div
                 %h3= t 'about.what_is_mastodon'
                 %p= t 'about.about_mastodon_html'
+              %div.contact
+                %h3= t 'about.administered_by'
+                = account_link_to(@instance_presenter.contact_account, link_to(t('about.learn_more'), about_more_path, class: 'button button-alternative'))
 
             = render 'features'
 
@@ -122,8 +125,13 @@
       - else
         .column-4.non-preview.landing-page__information
           .landing-page__features
-            %h3= t 'about.what_is_mastodon'
-            %p= t 'about.about_mastodon_html'
+            .features-list
+              %div
+                %h3= t 'about.what_is_mastodon'
+                %p= t 'about.about_mastodon_html'
+              %div.contact
+                %h3= t 'about.administered_by'
+                = account_link_to(@instance_presenter.contact_account, link_to(t('about.learn_more'), about_more_path, class: 'button button-alternative'))
 
             = render 'features'
 
@@ -134,3 +142,5 @@
             %p
               = link_to t('about.source_code'), @instance_presenter.source_url
               = " (#{@instance_presenter.version_number})"
+
+#modal-container

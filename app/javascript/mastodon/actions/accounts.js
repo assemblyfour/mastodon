@@ -1,5 +1,5 @@
 import api, { getLinks } from '../api';
-import asyncDB from '../db/async';
+import openDB from '../storage/db';
 import { importAccount, importFetchedAccount, importFetchedAccounts } from './importer';
 
 export const ACCOUNT_FETCH_REQUEST = 'ACCOUNT_FETCH_REQUEST';
@@ -29,6 +29,14 @@ export const ACCOUNT_MUTE_FAIL    = 'ACCOUNT_MUTE_FAIL';
 export const ACCOUNT_UNMUTE_REQUEST = 'ACCOUNT_UNMUTE_REQUEST';
 export const ACCOUNT_UNMUTE_SUCCESS = 'ACCOUNT_UNMUTE_SUCCESS';
 export const ACCOUNT_UNMUTE_FAIL    = 'ACCOUNT_UNMUTE_FAIL';
+
+export const ACCOUNT_PIN_REQUEST = 'ACCOUNT_PIN_REQUEST';
+export const ACCOUNT_PIN_SUCCESS = 'ACCOUNT_PIN_SUCCESS';
+export const ACCOUNT_PIN_FAIL    = 'ACCOUNT_PIN_FAIL';
+
+export const ACCOUNT_UNPIN_REQUEST = 'ACCOUNT_UNPIN_REQUEST';
+export const ACCOUNT_UNPIN_SUCCESS = 'ACCOUNT_UNPIN_SUCCESS';
+export const ACCOUNT_UNPIN_FAIL    = 'ACCOUNT_UNPIN_FAIL';
 
 export const FOLLOWERS_FETCH_REQUEST = 'FOLLOWERS_FETCH_REQUEST';
 export const FOLLOWERS_FETCH_SUCCESS = 'FOLLOWERS_FETCH_SUCCESS';
@@ -94,16 +102,19 @@ export function fetchAccount(id) {
 
     dispatch(fetchAccountRequest(id));
 
-    asyncDB.then(db => getFromDB(
+    openDB().then(db => getFromDB(
       dispatch,
       getState,
       db.transaction('accounts', 'read').objectStore('accounts').index('id'),
       id
-    )).catch(() => api(getState).get(`/api/v1/accounts/${id}`).then(response => {
+    ).then(() => db.close(), error => {
+      db.close();
+      throw error;
+    })).catch(() => api(getState).get(`/api/v1/accounts/${id}`).then(response => {
       dispatch(importFetchedAccount(response.data));
     })).then(() => {
       dispatch(fetchAccountSuccess());
-    }, error => {
+    }).catch(error => {
       dispatch(fetchAccountFail(id, error));
     });
   };
@@ -688,6 +699,72 @@ export function rejectFollowRequestFail(id, error) {
   return {
     type: FOLLOW_REQUEST_REJECT_FAIL,
     id,
+    error,
+  };
+};
+
+export function pinAccount(id) {
+  return (dispatch, getState) => {
+    dispatch(pinAccountRequest(id));
+
+    api(getState).post(`/api/v1/accounts/${id}/pin`).then(response => {
+      dispatch(pinAccountSuccess(response.data));
+    }).catch(error => {
+      dispatch(pinAccountFail(error));
+    });
+  };
+};
+
+export function unpinAccount(id) {
+  return (dispatch, getState) => {
+    dispatch(unpinAccountRequest(id));
+
+    api(getState).post(`/api/v1/accounts/${id}/unpin`).then(response => {
+      dispatch(unpinAccountSuccess(response.data));
+    }).catch(error => {
+      dispatch(unpinAccountFail(error));
+    });
+  };
+};
+
+export function pinAccountRequest(id) {
+  return {
+    type: ACCOUNT_PIN_REQUEST,
+    id,
+  };
+};
+
+export function pinAccountSuccess(relationship) {
+  return {
+    type: ACCOUNT_PIN_SUCCESS,
+    relationship,
+  };
+};
+
+export function pinAccountFail(error) {
+  return {
+    type: ACCOUNT_PIN_FAIL,
+    error,
+  };
+};
+
+export function unpinAccountRequest(id) {
+  return {
+    type: ACCOUNT_UNPIN_REQUEST,
+    id,
+  };
+};
+
+export function unpinAccountSuccess(relationship) {
+  return {
+    type: ACCOUNT_UNPIN_SUCCESS,
+    relationship,
+  };
+};
+
+export function unpinAccountFail(error) {
+  return {
+    type: ACCOUNT_UNPIN_FAIL,
     error,
   };
 };

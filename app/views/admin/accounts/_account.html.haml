@@ -1,12 +1,9 @@
 %tr
   %td.username
-    = link_to account.acct, admin_account_path(account.id)
-  %td.email
-    = account.user&.email
+    = account.username
   %td
-    = account.state.to_s.titlecase
-  %td= time_ago_in_words account.created_at
-  %td= [account.statuses_count, account.followers_count, account.following_count].join("–")
+    - unless account.local?
+      = link_to account.domain, admin_accounts_path(by_domain: account.domain)
   %td
     - if account.local?
       - if account.user.nil?
@@ -18,3 +15,4 @@
   %td
     = table_link_to 'circle', t('admin.accounts.web'), web_path("accounts/#{account.id}")
     = table_link_to 'globe', t('admin.accounts.public'), TagManager.instance.url_for(account)
+    = table_link_to 'pencil', t('admin.accounts.edit'), admin_account_path(account.id)

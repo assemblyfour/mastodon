@@ -6,6 +6,7 @@ import { showOnboardingOnce } from '../actions/onboarding';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { ScrollContext } from 'react-router-scroll-4';
 import UI from '../features/ui';
+import { fetchCustomEmojis } from '../actions/custom_emojis';
 import { hydrateStore } from '../actions/store';
 import { connectUserStream } from '../actions/streaming';
 import { IntlProvider, addLocaleData } from 'react-intl';
@@ -18,6 +19,9 @@ addLocaleData(localeData);
 export const store = configureStore();
 const hydrateAction = hydrateStore(initialState);
 store.dispatch(hydrateAction);
+
+// load custom emojis
+store.dispatch(fetchCustomEmojis());
 
 export default class Mastodon extends React.PureComponent {
 
@@ -32,13 +36,6 @@ export default class Mastodon extends React.PureComponent {
     // Ask after 1 minute
     if (typeof window.Notification !== 'undefined' && Notification.permission === 'default') {
       window.setTimeout(() => Notification.requestPermission(), 60 * 1000);
-    }
-
-    // Protocol handler
-    // Ask after 5 minutes
-    if (typeof navigator.registerProtocolHandler !== 'undefined') {
-      const handlerUrl = window.location.protocol + '//' + window.location.host + '/intent?uri=%s';
-      window.setTimeout(() => navigator.registerProtocolHandler('web+mastodon', handlerUrl, 'Mastodon'), 5 * 60 * 1000);
     }
 
     store.dispatch(showOnboardingOnce());
