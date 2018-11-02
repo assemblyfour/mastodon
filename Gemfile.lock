@@ -1,4 +1,19 @@
 GIT
+  remote: https://github.com/chendo/log16.git
+  revision: 15ea6485b968761ecf702a4ba57676e77635e356
+  specs:
+    log16 (1.0.0)
+      json
+
+GIT
+  remote: https://github.com/chendo/sidekiq-datadog.git
+  revision: 3e9d2bab795c817d9bf75a2de61b14bb24bcf20c
+  specs:
+    sidekiq-datadog (0.3.5)
+      dogstatsd-ruby (>= 2.0.0)
+      sidekiq
+
+GIT
   remote: https://github.com/rtomayko/posix-spawn
   revision: 58465d2e213991f8afb13b984854a49fcdcc980c
   ref: 58465d2e213991f8afb13b984854a49fcdcc980c
@@ -181,6 +196,7 @@ GEM
       rpam2 (~> 4.0)
     diff-lcs (1.3)
     docile (1.3.0)
+    dogstatsd-ruby (4.0.0)
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.0.2)
@@ -350,6 +366,7 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (5.0.2)
+    newrelic_rpm (5.4.0.347)
     nio4r (2.3.1)
     nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
@@ -700,6 +717,7 @@ DEPENDENCIES
   letter_opener (~> 1.4)
   letter_opener_web (~> 1.3)
   link_header (~> 0.0)
+  log16!
   lograge (~> 0.10)
   makara (~> 0.4)
   mario-redis-lock (~> 1.2)
@@ -707,6 +725,7 @@ DEPENDENCIES
   microformats (~> 4.0)
   mime-types (~> 3.2)
   net-ldap (~> 0.10)
+  newrelic_rpm
   nokogiri (~> 1.8)
   nsa (~> 0.2)
   oj (~> 3.7)
@@ -746,6 +765,7 @@ DEPENDENCIES
   scss_lint (~> 0.57)
   sidekiq (~> 5.2)
   sidekiq-bulk (~> 0.1.1)
+  sidekiq-datadog!
   sidekiq-scheduler (~> 3.0)
   sidekiq-unique-jobs (~> 5.0)
   simple-navigation (~> 4.0)

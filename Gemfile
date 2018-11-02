@@ -92,6 +92,9 @@ gem 'webpush'
 gem 'json-ld', '~> 2.2'
 gem 'rdf-normalize', '~> 0.3'
 
+gem 'newrelic_rpm'
+gem 'sidekiq-datadog', git: 'https://github.com/chendo/sidekiq-datadog.git'
+
 group :development, :test do
   gem 'fabrication', '~> 2.20'
   gem 'fuubar', '~> 2.3'
@@ -141,6 +144,7 @@ group :development do
 end
 
 group :production do
+  gem 'log16', git: 'https://github.com/chendo/log16.git'
   gem 'lograge', '~> 0.10'
   gem 'redis-rails', '~> 5.0'
 end
