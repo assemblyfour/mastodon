@@ -35,6 +35,7 @@
 #  moderator                 :boolean          default(FALSE), not null
 #  invite_id                 :bigint(8)
 #  remember_token            :string
+#  canonical_email           :string
 #  chosen_languages          :string           is an Array
 #
 
