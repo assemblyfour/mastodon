@@ -12,15 +12,15 @@ class SwlistingsValidator < ActiveModel::Validator
 
     if status.account.created_at > 1.week.ago
       status.errors.add(:base, "Your account must be older than a week to post on the #swlisting hashtag")
+      Stats.increment('listings.account_too_new')
       return
     end
 
     unless status.account.avatar?
+      Stats.increment('listings.avatar_required')
       status.errors.add(:base, 'You need a profile picture to post on the #swlisting hashtag')
       return
     end
-
-    ips = [status.account.user.current_sign_in_ip, status.account.user.last_sign_in_ip].compact.map(&:to_s).uniq
 
     swlisting_statuses = status.account.statuses.
                                 tagged_with(Tag.find_by(name: 'swlisting')).
@@ -29,14 +29,18 @@ class SwlistingsValidator < ActiveModel::Validator
                                 where(Status.arel_table[:updated_at].gt(1.day.ago))
 
     unless swlisting_statuses.count { |s| s.text =~ /#swlisting/ } < 3
+      Stats.increment('listings.daily_limit')
       return status.errors.add(:base, 'You can only post 3 times per day to #swlisting')
     end
+
+    ips = [status.account.user.current_sign_in_ip, status.account.user.last_sign_in_ip].compact.map(&:to_s).uniq
 
     if Report.joins(target_account: [:user]).
       where('current_sign_in_ip IN (?) OR last_sign_in_ip IN (?)', ips, ips).
       where('comment ~* ?', '.*(fake|spam|scam).*').
       distinct(:account_id).
       count >= 2
+      Stats.increment('listings.ip_blocked')
       status.errors.add(:base, "Your IP has been blocked for spam.")
       return
     end
