@@ -20,7 +20,7 @@ class SwlistingsValidator < ActiveModel::Validator
       return
     end
 
-    ips = [status.account.user.current_sign_in_ip, status.account.user.last_sign_in_ip].compact.uniq
+    ips = [status.account.user.current_sign_in_ip, status.account.user.last_sign_in_ip].compact.map(&:to_s).uniq
 
     swlisting_statuses = status.account.statuses.
                                 tagged_with(Tag.find_by(name: 'swlisting')).
