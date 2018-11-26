@@ -36,12 +36,13 @@ class SwlistingsValidator < ActiveModel::Validator
     ips = [status.account.user.current_sign_in_ip, status.account.user.last_sign_in_ip].compact.map(&:to_s).uniq
 
     if Report.joins(target_account: [:user]).
+      where('reports.created_at > ?', 1.month.ago).
       where('current_sign_in_ip IN (?) OR last_sign_in_ip IN (?)', ips, ips).
       where('comment ~* ?', '.*(fake|spam|scam).*').
       distinct(:account_id).
       count >= 2
       Stats.increment('listings.ip_blocked')
-      status.errors.add(:base, "Your IP has been blocked for spam.")
+      status.errors.add(:base, "Your IP has been blocked for spam. If you believe this is an error, please contact support@assemblyfour.com.")
       return
     end
   end

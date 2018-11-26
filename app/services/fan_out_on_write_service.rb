@@ -80,6 +80,11 @@ class FanOutOnWriteService < BaseService
 
   def deliver_to_public(status)
     return if status.listing?
+
+    # If more than 5 public statuses were posted within 10 minutes, don't post it to timeline
+    return if status.account.statuses.without_replies.without_reblogs.public_visibility.limit(20).pluck(:created_at).count { |t| t > 10.minutes.ago } >= 5
+    return if !status.account.marked_not_spam? && status.account.targeted_account_reports.where('comment ~* ?', '.*(fake|spam|scam).*').distinct(:account_id).count >= 3
+
     Rails.logger.debug "Delivering status #{status.id} to public timeline"
 
     Redis.current.publish('timeline:public', @payload)

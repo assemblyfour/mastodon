@@ -256,6 +256,10 @@ class Account < ApplicationRecord
     shared_inbox_url.presence || inbox_url
   end
 
+  def marked_not_spam?
+    targeted_moderation_notes.where('content ~* ?', '.*not spam.*').any?
+  end
+
   class << self
     def readonly_attributes
       super - %w(statuses_count following_count followers_count)
