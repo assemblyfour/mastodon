@@ -44,7 +44,7 @@ class SwlistingsValidator < ActiveModel::Validator
       distinct(:account_id).
       count >= 2
       Stats.increment('listings.ip_blocked')
-      status.errors.add(:base, "Your IP has been blocked for spam. If you believe this is an error, please contact support@assemblyfour.com.")
+      status.errors.add(:base, "Your IP has been blocked for spam. Please contact support@assemblyfour.com")
       return
     end
   end
