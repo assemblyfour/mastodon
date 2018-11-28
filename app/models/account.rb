@@ -260,6 +260,10 @@ class Account < ApplicationRecord
     targeted_moderation_notes.where('content ~* ?', '.*not spam.*').any?
   end
 
+  def probably_not_spam?
+    created_at > 1.month.ago && followers_count >= 100
+  end
+
   class << self
     def readonly_attributes
       super - %w(statuses_count following_count followers_count)

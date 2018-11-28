@@ -33,7 +33,7 @@ class SwlistingsValidator < ActiveModel::Validator
       return status.errors.add(:base, 'You can only post 3 times per day to #swlisting')
     end
 
-    return if status.account.marked_not_spam?
+    return if status.account.probably_not_spam? || status.account.marked_not_spam?
 
     ips = [status.account.user.current_sign_in_ip, status.account.user.last_sign_in_ip].compact.map(&:to_s).uniq
 
