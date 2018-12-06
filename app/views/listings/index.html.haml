@@ -12,7 +12,10 @@
 
 .compact-header
   %h1 Switter Listings
-
+  %p
+    Check out&nbsp;
+    %a{href: "https://tryst.link", style: "color: #8aa2b8"}> Tryst.link
+    , the independent escort directory created by Assembly Four, the team behind Switter.
 %p
   - cache 'listings_count', expires_in: 1.minute, race_condition_ttl: 5.seconds do
     Search #{ListingSearchService.listings.count} active Switter listings posted in the last 30 days.
