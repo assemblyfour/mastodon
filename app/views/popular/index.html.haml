@@ -1,30 +1,4 @@
 .compact-header
   %h1= "Popular Toots By #{@period.to_s.titlecase}"
-  = link_to 'By Day', '/popular', class: 'button'
-  = link_to 'By Week', '/popular/week', class: 'button'
-  = link_to 'By Month', '/popular/month', class: 'button'
-.links
-  - if @page > 1
-    = link_to 'Newer', {page: @page - 1}, class: 'button'
-  - else
-    %br
-  = link_to 'Older', {page: @page + 1}, class: 'button'
 
-%br
-- @popular.each do |status|
-  - cache status, expires_in: 5.minutes, race_condition_ttl: 5.seconds do
-    .activity-stream.activity-stream-headless.h-entry
-      .entry
-        = render partial: "stream_entries/detailed_status", locals: { status: status, include_threads: false }
-  %br
-
-.links
-  - if @page > 1
-    = link_to 'Newer', {page: @page - 1}, class: 'button'
-  - else
-    %br
-  = link_to 'Older', {page: @page + 1}, class: 'button'
-
-:css
-  .links { display: flex; justify-content: space-between }
-  .links > * { flex: 1; max-width: 100px }
+%p Popular toots has been disabled for now due to performance reasons.

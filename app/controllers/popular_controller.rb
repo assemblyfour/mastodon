@@ -39,6 +39,7 @@ class PopularController < ApplicationController
   IGNORE_POSTS_REGEXP = ENV['POPULAR_POSTS_IGNORE_REGEXP'] ? Regexp.new(ENV['POPULAR_POSTS_IGNORE_REGEXP'], true) : nil
   def fetch_popular(period:)
     raise ArgumentError unless [:day, :week, :month].include?(period)
+    return nil
     expires = 1.send(period) * 0.005
     race_condition_ttl = expires * 0.05
     Rails.cache.fetch("popular/#{period}/#{page}", expires_in: expires, race_condition_ttl: race_condition_ttl) do
