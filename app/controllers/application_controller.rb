@@ -20,6 +20,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
   rescue_from ActionController::InvalidAuthenticityToken, with: :unprocessable_entity
   rescue_from Mastodon::NotPermittedError, with: :forbidden
+  rescue_from ActiveRecord::ConnectionTimeoutError, with: :terminate_self
 
   before_action :store_current_location, except: :raise_not_found, unless: :devise_controller?
   before_action :check_suspension, if: :user_signed_in?
@@ -29,6 +30,11 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def terminate_self
+    # exit gracefully to fix connection timeout error due to pool
+    Puma::Server.stop
+  end
 
   def https_enabled?
     Rails.env.production?
