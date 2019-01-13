@@ -63,6 +63,7 @@ class Status < ApplicationRecord
   validates_with DisallowedHashtagsValidator
   validates_with SwlistingsValidator
   validates_with TempSuspensionValidator
+  validates_with AbuseValidator
   validates :reblog, uniqueness: { scope: :account }, if: :reblog?
 
   default_scope { recent }
