@@ -11,7 +11,11 @@ module Admin
 
     def index
       authorize :report, :index?
-      reports = filtered_reports.group_by { |r| r.target_account_user&.current_sign_in_ip }.sort_by { |ip, reports| reports.count }.reverse
+      reports = filtered_reports.where('target_accounts_reports.suspended = false').references(:target_accounts)
+      if !params[:all]
+        reports = reports.where('reports.created_at > ?', 14.days.ago)
+      end
+      reports = reports.group_by { |r| r.target_account_user&.current_sign_in_ip }.sort_by { |ip, reports| reports.count }
 
       @reports = Kaminari.paginate_array(reports).page(params[:page])
     end

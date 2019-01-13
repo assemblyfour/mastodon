@@ -1,7 +1,7 @@
 %tr{id: "report-#{report.id}"}
   %td.target
     = link_to report.target_account.acct, admin_account_path(report.target_account.id)
-    - if report.target_account.state != :confirmed
+    - if ![:confirmed, :remote, :unconfirmed].include?(report.target_account.state)
       = "(#{report.target_account.state})"
   %td.reporter
     = link_to report.account.acct, admin_account_path(report.account.id)
