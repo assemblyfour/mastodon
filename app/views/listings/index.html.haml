@@ -13,9 +13,11 @@
 .compact-header
   %h1 Switter Listings
   %p
-    Check out&nbsp;
+    Looking for verified escorts? Check out our newest project&nbsp;
     %a{href: "https://tryst.link", style: "color: #8aa2b8"}> Tryst.link
-    , the independent escort directory created by Assembly Four, the team behind Switter.
+    – With over 1000's independent escorts, it's the better Backpage alternative.
+
+%br
 %p
   - cache 'listings_count', expires_in: 1.minute, race_condition_ttl: 5.seconds do
     Search #{ListingSearchService.listings.count} active Switter listings posted in the last 30 days.
@@ -50,6 +52,16 @@
     .actions
       %button Search
       = link_to 'Post a listing', '/new', class: 'button'
+
+%div
+  %h2 About Switter Listings
+  %p Switter Listings was created mere hours after Backpage was shut down so workers had a place to go. Switter Listings has been touted as a solid Backpage replacement by sex workers worldwide.
+
+- content_for :page_title do
+  Switter Listings - Backpage alternative
+
+- content_for :header_tags do
+  %meta{ name: 'description', content: "Switter Listings is an Backpage alternative run by sex workers."}
 
 :css
   .listing__metadata {
