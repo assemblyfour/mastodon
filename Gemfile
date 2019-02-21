@@ -13,9 +13,9 @@ gem 'pg', '~> 1.0'
 gem 'pghero', '~> 2.1'
 gem 'dotenv-rails', '~> 2.2', '< 2.3'
 
+gem 'aws-sdk-s3', '~> 1.9', require: false
 gem 'fog-core', '~> 1.45'
-gem 'fog-aws', require: false
-gem 'fog-local', '~> 0.4', require: false
+gem 'fog-local', '~> 0.5', require: false
 gem 'fog-openstack', '~> 0.1', require: false
 gem 'paperclip', '~> 6.0'
 gem 'paperclip-av-transcoder', '~> 0.6'
@@ -42,7 +42,7 @@ gem 'omniauth-cas', '~> 1.1'
 gem 'omniauth-saml', '~> 1.10'
 gem 'omniauth', '~> 1.2'
 
-gem 'doorkeeper', '~> 4.3'
+gem 'doorkeeper', '~> 5.0'
 gem 'fast_blank', '~> 1.0'
 gem 'fastimage'
 gem 'goldfinger', '~> 2.1'
@@ -51,6 +51,7 @@ gem 'redis-namespace', '~> 1.5'
 gem 'htmlentities', '~> 4.3'
 gem 'http', '~> 3.2'
 gem 'http_accept_language', '~> 2.1'
+gem 'http_parser.rb', '~> 0.6', git: 'https://github.com/tmm1/http_parser.rb', ref: '54b17ba8c7d8d20a16dfc65d1775241833219cf2'
 gem 'httplog', '~> 1.0'
 gem 'idn-ruby', require: 'idn'
 gem 'kaminari', '~> 1.1'
@@ -61,18 +62,16 @@ gem 'nsa', '~> 0.2'
 gem 'oj', '~> 3.5'
 gem 'ostatus2', '~> 2.0'
 gem 'ox', '~> 2.9'
-gem 'posix-spawn', '~> 0.3'
+gem 'posix-spawn', git: 'https://github.com/rtomayko/posix-spawn', ref: '58465d2e213991f8afb13b984854a49fcdcc980c'
 gem 'pundit', '~> 1.1'
 gem 'premailer-rails'
 gem 'rack-attack', '~> 5.2'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
-gem 'rack-timeout', '~> 0.4'
 gem 'rails-i18n', '~> 5.1'
 gem 'rails-settings-cached', '~> 0.6'
 gem 'redis', '~> 4.0', require: ['redis', 'redis/connection/hiredis']
 gem 'mario-redis-lock', '~> 1.2', require: 'redis_lock'
 gem 'rqrcode', '~> 0.10'
-gem 'ruby-oembed', '~> 0.12', require: 'oembed'
 gem 'ruby-progressbar', '~> 1.4'
 gem 'sanitize', '~> 4.6'
 gem 'sidekiq', '~> 5.1'
@@ -96,6 +95,7 @@ gem 'rdf-normalize', '~> 0.3'
 
 gem 'newrelic_rpm'
 gem 'sidekiq-datadog', git: 'https://github.com/chendo/sidekiq-datadog.git'
+
 
 group :development, :test do
   gem 'fabrication', '~> 2.20'
@@ -147,6 +147,6 @@ end
 
 group :production do
   gem 'log16', git: 'https://github.com/chendo/log16.git'
-  gem 'lograge', '~> 0.7'
+  gem 'lograge', '~> 0.10'
   gem 'redis-rails', '~> 5.0'
 end
