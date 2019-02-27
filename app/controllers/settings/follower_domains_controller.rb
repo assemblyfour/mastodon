@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'sidekiq-bulk'
-
 class Settings::FollowerDomainsController < ApplicationController
   layout 'admin'
 
@@ -15,7 +13,7 @@ class Settings::FollowerDomainsController < ApplicationController
   def update
     domains = bulk_params[:select] || []
 
-    SoftBlockDomainFollowersWorker.push_bulk(domains) do |domain|
+    AfterAccountDomainBlockWorker.push_bulk(domains) do |domain|
       [current_account.id, domain]
     end
 
