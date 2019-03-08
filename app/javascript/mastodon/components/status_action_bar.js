@@ -9,6 +9,7 @@ import { me } from '../initial_state';
 
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
+  redraft: { id: 'status.redraft', defaultMessage: 'Delete & re-draft' },
   direct: { id: 'status.direct', defaultMessage: 'Direct message @{name}' },
   mention: { id: 'status.mention', defaultMessage: 'Mention @{name}' },
   mute: { id: 'account.mute', defaultMessage: 'Mute @{name}' },
@@ -18,6 +19,8 @@ const messages = defineMessages({
   more: { id: 'status.more', defaultMessage: 'More' },
   replyAll: { id: 'status.replyAll', defaultMessage: 'Reply to thread' },
   reblog: { id: 'status.reblog', defaultMessage: 'Boost' },
+  reblog_private: { id: 'status.reblog_private', defaultMessage: 'Boost to original audience' },
+  cancel_reblog_private: { id: 'status.cancel_reblog_private', defaultMessage: 'Unboost' },
   cannot_reblog: { id: 'status.cannot_reblog', defaultMessage: 'This post cannot be boosted' },
   favourite: { id: 'status.favourite', defaultMessage: 'Favourite' },
   open: { id: 'status.open', defaultMessage: 'Expand this status' },
@@ -69,6 +72,8 @@ export default class StatusActionBar extends ImmutablePureComponent {
     navigator.share({
       text: this.props.status.get('search_index'),
       url: this.props.status.get('url'),
+    }).catch((e) => {
+      if (e.name !== 'AbortError') console.error(e);
     });
   }
 
@@ -82,6 +87,10 @@ export default class StatusActionBar extends ImmutablePureComponent {
 
   handleDeleteClick = () => {
     this.props.onDelete(this.props.status);
+  }
+
+  handleRedraftClick = () => {
+    this.props.onDelete(this.props.status, true);
   }
 
   handlePinClick = () => {
@@ -149,9 +158,14 @@ export default class StatusActionBar extends ImmutablePureComponent {
     if (status.getIn(['account', 'id']) === me) {
       if (publicStatus) {
         menu.push({ text: intl.formatMessage(status.get('pinned') ? messages.unpin : messages.pin), action: this.handlePinClick });
+      } else {
+        if (status.get('visibility') === 'private') {
+          menu.push({ text: intl.formatMessage(status.get('reblogged') ? messages.cancel_reblog_private : messages.reblog_private), action: this.handleReblogClick });
+        }
       }
 
       menu.push({ text: intl.formatMessage(messages.delete), action: this.handleDeleteClick });
+      menu.push({ text: intl.formatMessage(messages.redraft), action: this.handleRedraftClick });
     } else {
       menu.push({ text: intl.formatMessage(messages.mention, { name: status.getIn(['account', 'username']) }), action: this.handleMentionClick });
       menu.push({ text: intl.formatMessage(messages.direct, { name: status.getIn(['account', 'username']) }), action: this.handleDirectClick });
