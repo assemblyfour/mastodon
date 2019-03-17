@@ -18,9 +18,6 @@ const messages = defineMessages({
   notifications: { id: 'tabs_bar.notifications', defaultMessage: 'Notifications' },
   public_timeline: { id: 'navigation_bar.public_timeline', defaultMessage: 'Federated timeline' },
   settings_subheading: { id: 'column_subheading.settings', defaultMessage: 'Settings' },
-<<<<<<< HEAD
-  community_timeline: { id: 'navigation_bar.community_timeline', defaultMessage: 'Community timeline' },
-=======
   community_timeline: { id: 'navigation_bar.community_timeline', defaultMessage: 'Local timeline' },
   direct: { id: 'navigation_bar.direct', defaultMessage: 'Direct messages' },
 >>>>>>> upstream/stable-2.4
