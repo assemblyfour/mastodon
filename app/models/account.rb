@@ -41,7 +41,6 @@
 #  shared_inbox_url        :string           default(""), not null
 #  followers_url           :string           default(""), not null
 #  protocol                :integer          default("ostatus"), not null
-#  id                      :integer          not null, primary key
 #  memorial                :boolean          default(FALSE), not null
 #  moved_to_account_id     :bigint(8)
 #  featured_collection_url :string
