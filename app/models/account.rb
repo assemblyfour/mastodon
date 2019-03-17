@@ -304,6 +304,7 @@ class Account < ApplicationRecord
 
   def probably_not_spam?
     created_at > 1.month.ago && followers_count >= 100
+  end
 
   class Field < ActiveModelSerializers::Model
     attributes :name, :value, :account, :errors
