@@ -59,13 +59,9 @@
   "column_header.show_settings": "Instellingen tonen",
   "column_header.unpin": "Losmaken",
   "column_subheading.settings": "Instellingen",
-<<<<<<< HEAD
-  "compose_form.direct_message_warning": "This toot will only be visible to all the mentioned users.",
-=======
   "community.column_settings.media_only": "Alleen media",
   "compose_form.direct_message_warning": "Deze toot wordt alleen naar vermelde gebruikers verstuurd. Echter, de beheerders en moderatoren van jouw en de ontvangende Mastodonserver(s) kunnen dit bericht mogelijk wel bekijken.",
   "compose_form.direct_message_warning_learn_more": "Meer leren",
->>>>>>> upstream/stable-2.4
   "compose_form.hashtag_warning": "Deze toot valt niet onder een hashtag te bekijken, omdat deze niet op openbare tijdlijnen wordt getoond. Alleen openbare toots kunnen via hashtags gevonden worden.",
   "compose_form.lock_disclaimer": "Jouw account is niet {locked}. Iedereen kan jou volgen en kan de toots zien die je alleen aan jouw volgers hebt gericht.",
   "compose_form.lock_disclaimer.lock": "besloten",

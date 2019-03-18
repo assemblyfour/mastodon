@@ -59,15 +59,10 @@
   "column_header.show_settings": "顯示設定",
   "column_header.unpin": "取下",
   "column_subheading.settings": "設定",
-<<<<<<< HEAD
-  "compose_form.direct_message_warning": "This toot will only be visible to all the mentioned users.",
-  "compose_form.hashtag_warning": "This toot won't be listed under any hashtag as it is unlisted. Only public toots can be searched by hashtag.",
-=======
   "community.column_settings.media_only": "僅媒體",
   "compose_form.direct_message_warning": "這文章只有被提及的用戶才可以看到。",
   "compose_form.direct_message_warning_learn_more": "了解更多",
   "compose_form.hashtag_warning": "這文章因為不是公開，所以不會被標籤搜索。只有公開的文章才會被標籤搜索。",
->>>>>>> upstream/stable-2.4
   "compose_form.lock_disclaimer": "你的用戶狀態為「{locked}」，任何人都能立即關注你，然後看到「只有關注者能看」的文章。",
   "compose_form.lock_disclaimer.lock": "公共",
   "compose_form.placeholder": "你在想甚麼？",

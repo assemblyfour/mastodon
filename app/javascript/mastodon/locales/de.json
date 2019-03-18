@@ -59,13 +59,9 @@
   "column_header.show_settings": "Einstellungen anzeigen",
   "column_header.unpin": "Lösen",
   "column_subheading.settings": "Einstellungen",
-<<<<<<< HEAD
-  "compose_form.direct_message_warning": "This toot will only be visible to all the mentioned users.",
-=======
   "community.column_settings.media_only": "Nur Medien",
   "compose_form.direct_message_warning": "Dieser Beitrag wird nur für die erwähnten Nutzer sichtbar sein.",
   "compose_form.direct_message_warning_learn_more": "Mehr erfahren",
->>>>>>> upstream/stable-2.4
   "compose_form.hashtag_warning": "Dieser Beitrag wird nicht unter einen dieser Hashtags sichtbar sein, solange er ungelistet ist. Bei einer Suche kann er nicht gefunden werden.",
   "compose_form.lock_disclaimer": "Dein Profil ist nicht {locked}. Wer dir folgen will, kann das jederzeit tun und dann auch deine privaten Beiträge sehen.",
   "compose_form.lock_disclaimer.lock": "gesperrt",
