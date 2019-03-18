@@ -120,14 +120,10 @@ en:
       push_subscription_expires: PuSH subscription expires
       redownload: Refresh avatar
       remove_avatar: Remove avatar
-<<<<<<< HEAD
-      remove_header: Remove header
-=======
       resend_confirmation:
         already_confirmed: This user is already confirmed
         send: Resend confirmation email
         success: Confirmation email successfully sent!
->>>>>>> upstream/stable-2.4
       reset: Reset
       reset_password: Reset password
       resubscribe: Resubscribe
@@ -174,19 +170,11 @@ en:
         memorialize_account: "%{name} turned %{target}'s account into a memoriam page"
         promote_user: "%{name} promoted user %{target}"
         remove_avatar_user: "%{name} removed %{target}'s avatar"
-<<<<<<< HEAD
-        remove_header_user: "%{name} removed %{target}'s header"
-=======
->>>>>>> upstream/stable-2.4
         reopen_report: "%{name} reopened report %{target}"
         reset_password_user: "%{name} reset password of user %{target}"
         resolve_report: "%{name} resolved report %{target}"
         silence_account: "%{name} silenced %{target}'s account"
         suspend_account: "%{name} suspended %{target}'s account"
-<<<<<<< HEAD
-        temp_suspend_account: "%{name} temporarily suspended %{target}'s account"
-=======
->>>>>>> upstream/stable-2.4
         unassigned_report: "%{name} unassigned report %{target}"
         unsilence_account: "%{name} unsilenced %{target}'s account"
         unsuspend_account: "%{name} unsuspended %{target}'s account"
@@ -283,43 +271,20 @@ en:
       action_taken_by: Action taken by
       are_you_sure: Are you sure?
       assign_to_self: Assign to me
-<<<<<<< HEAD
-      assigned: Assigned Moderator
-      comment:
-        label: Report Comment
-        none: None
-      created_at: Reported
-      delete: Delete
-      history: Moderation History
-=======
       assigned: Assigned moderator
       comment:
         none: None
       created_at: Reported
->>>>>>> upstream/stable-2.4
       id: ID
       mark_as_resolved: Mark as resolved
       mark_as_unresolved: Mark as unresolved
       notes:
-<<<<<<< HEAD
-        create: Add Note
-        create_and_resolve: Resolve with Note
-        create_and_unresolve: Reopen with Note
-        delete: Delete
-        label: Moderator Notes
-        new_label: Add Moderator Note
-        placeholder: Describe what actions have been taken, or any other updates to this report…
-      nsfw:
-        'false': Unhide media attachments
-        'true': Hide media attachments
-=======
         create: Add note
         create_and_resolve: Resolve with note
         create_and_unresolve: Reopen with note
         delete: Delete
         placeholder: Describe what actions have been taken, or any other related updates...
       reopen: Reopen report
->>>>>>> upstream/stable-2.4
       report: 'Report #%{id}'
       report_contents: Contents
       reported_account: Reported account
@@ -328,7 +293,6 @@ en:
       resolved_msg: Report successfully resolved!
       silence_account: Silence account
       status: Status
-      statuses: Reported Toots
       suspend_account: Suspend account
       target: Target
       title: Reports
@@ -731,10 +695,7 @@ en:
     disallowed_hashtags:
       one: 'contained a disallowed hashtag: %{tags}'
       other: 'contained the disallowed hashtags: %{tags}'
-<<<<<<< HEAD
-=======
     language_detection: Automatically detect language
->>>>>>> upstream/stable-2.4
     open_in_web: Open in web
     over_character_limit: character limit of %{max} exceeded
     pin_errors:
