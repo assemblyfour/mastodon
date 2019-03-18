@@ -82,7 +82,6 @@ module Admin
       redirect_to admin_account_path(@account.id)
     end
 
-
     private
 
     def set_account

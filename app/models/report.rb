@@ -3,16 +3,16 @@
 #
 # Table name: reports
 #
-#  id                         :integer          not null, primary key
-#  status_ids                 :integer          default([]), not null, is an Array
+#  id                         :bigint(8)        not null, primary key
+#  status_ids                 :bigint(8)        default([]), not null, is an Array
 #  comment                    :text             default(""), not null
 #  action_taken               :boolean          default(FALSE), not null
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
-#  account_id                 :integer          not null
-#  action_taken_by_account_id :integer
-#  target_account_id          :integer          not null
-#  assigned_account_id        :integer
+#  account_id                 :bigint(8)        not null
+#  action_taken_by_account_id :bigint(8)
+#  target_account_id          :bigint(8)        not null
+#  assigned_account_id        :bigint(8)
 #
 
 class Report < ApplicationRecord
@@ -21,7 +21,7 @@ class Report < ApplicationRecord
   belongs_to :action_taken_by_account, class_name: 'Account', optional: true
   belongs_to :assigned_account, class_name: 'Account', optional: true
 
-  has_one :target_account_user, class_name: 'User', through: :target_account, source: :user
+ has_one :target_account_user, class_name: 'User', through: :target_account, source: :user
 
   has_many :notes, class_name: 'ReportNote', foreign_key: :report_id, inverse_of: :report, dependent: :destroy
 
@@ -50,9 +50,7 @@ class Report < ApplicationRecord
     update!(assigned_account_id: nil)
   end
 
-  def resolve!(acting_account, note: nil)
-    target_account.targeted_moderation_notes.create!(account: acting_account, content: note) if note
-
+  def resolve!(acting_account)
     update!(action_taken: true, action_taken_by_account_id: acting_account.id)
   end
 
